@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Parent Registration - ECCD System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="card p-4 p-md-5 border-0 shadow">
+            <div class="text-center mb-4">
+                <i class="bi bi-people-fill text-success fs-1"></i>
+                <h3 class="fw-bold mt-2">Parent & Child Registration</h3>
+                <p class="text-muted">Register to monitor your child's developmental records</p>
+            </div>
+            
+            <form action="{{ url_for('auth.register_parent') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <h5 class="border-bottom pb-2 mb-3 text-success fw-bold"><i class="bi bi-person-fill"></i> Parent Info</h5>
+                
+                <div class="row g-3 mb-4">
+                    <!-- Parent Name -->
+                    <div class="col-md-6">
+                        <label for="parent_name" class="form-label fw-semibold">Parent / Guardian Full Name</label>
+                        <input type="text" class="form-control" id="parent_name" name="parent_name" placeholder="E.g., Juan Dela Cruz" value="{{ form_data.parent_name or '' }}" required>
+                        <div class="invalid-feedback">Please enter your name.</div>
+                    </div>
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label for="email" class="form-label fw-semibold">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="E.g., juan@example.com" value="{{ form_data.email or '' }}" required>
+                        <div class="invalid-feedback">Please enter a valid email.</div>
+                    </div>
+                    <!-- Mobile -->
+                    <div class="col-md-6">
+                        <label for="mobile" class="form-label fw-semibold">Mobile Number</label>
+                        <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="E.g., 09123456789" value="{{ form_data.mobile or '' }}" required>
+                        <div class="invalid-feedback">Please enter your mobile number.</div>
+                    </div>
+                    <!-- Relationship -->
+                    <div class="col-md-6">
+                        <label for="relationship" class="form-label fw-semibold">Relationship to Child</label>
+                        <select class="form-select" id="relationship" name="relationship" required>
+                            <option value="" disabled selected>Choose relationship...</option>
+                            <option value="Mother" {% if form_data.relationship == 'Mother' %}selected{% endif %}>Mother</option>
+                            <option value="Father" {% if form_data.relationship == 'Father' %}selected{% endif %}>Father</option>
+                            <option value="Guardian" {% if form_data.relationship == 'Guardian' %}selected{% endif %}>Guardian</option>
+                        </select>
+                        <div class="invalid-feedback">Please select relationship.</div>
+                    </div>
+                    <!-- Complete Address -->
+                    <div class="col-12">
+                        <label for="address" class="form-label fw-semibold">Complete Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="2" placeholder="Street, Barangay, City, Province" required>{{ form_data.address or '' }}</textarea>
+                        <div class="invalid-feedback">Please enter address.</div>
+                    </div>
+                </div>
+                
+                <h5 class="border-bottom pb-2 mb-3 text-success fw-bold"><i class="bi bi-emoji-smile"></i> Child (Learner) Info</h5>
+                
+                <div class="row g-3 mb-4">
+                    <!-- Learner Name -->
+                    <div class="col-md-6">
+                        <label for="learner_full_name" class="form-label fw-semibold">Learner's Full Name</label>
+                        <input type="text" class="form-control" id="learner_full_name" name="learner_full_name" placeholder="E.g., Junior Dela Cruz" value="{{ form_data.learner_full_name or '' }}" required>
+                        <div class="invalid-feedback">Please enter learner's name.</div>
+                    </div>
+                    <!-- Learner ID (LRN) -->
+                    <div class="col-md-6">
+                        <label for="learner_id" class="form-label fw-semibold">Learner ID (LRN)</label>
+                        <input type="text" class="form-control" id="learner_id" name="learner_id" placeholder="E.g., LRN-12345678" value="{{ form_data.learner_id or '' }}" required>
+                        <div class="invalid-feedback">Please enter LRN.</div>
+                    </div>
+                    <!-- Child Development Center -->
+                    <div class="col-md-6">
+                        <label for="center_name" class="form-label fw-semibold">Child Development Center</label>
+                        <input type="text" class="form-control" id="center_name" name="center_name" placeholder="E.g., Sunshine Kindergarten Garden" value="{{ form_data.center_name or '' }}" required>
+                        <div class="invalid-feedback">Please enter child's school center.</div>
+                    </div>
+                    <!-- Learner Gender -->
+                    <div class="col-md-6">
+                        <label for="gender" class="form-label fw-semibold">Learner Gender</label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="" disabled selected>Choose gender...</option>
+                            <option value="Male" {% if form_data.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if form_data.gender == 'Female' %}selected{% endif %}>Female</option>
+                        </select>
+                        <div class="invalid-feedback">Please select gender.</div>
+                    </div>
+                    <!-- Learner Birthdate -->
+                    <div class="col-md-6">
+                        <label for="birthdate" class="form-label fw-semibold">Learner Birthdate</label>
+                        <input type="date" class="form-control" id="birthdate" name="birthdate" value="{{ form_data.birthdate or '' }}" required>
+                        <div class="invalid-feedback">Please enter birthdate.</div>
+                    </div>
+                    <!-- Learner Photo -->
+                    <div class="col-md-6">
+                        <label for="learner_photo" class="form-label fw-semibold">Learner Photo</label>
+                        <input type="file" class="form-control" id="learner_photo" name="learner_photo" accept="image/*">
+                        <small class="text-muted">Upload a photo of the child (JPG, PNG, max 5MB)</small>
+                    </div>
+                </div>
+                
+                <h5 class="border-bottom pb-2 mb-3 text-success fw-bold"><i class="bi bi-lock-fill"></i> Account Credentials</h5>
+                <div class="row g-3 mb-4">
+                    <!-- Username -->
+                    <div class="col-12">
+                        <label for="username" class="form-label fw-semibold">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" value="{{ form_data.username or '' }}" required>
+                        <div class="invalid-feedback">Please choose username.</div>
+                    </div>
+                    <!-- Password -->
+                    <div class="col-md-6">
+                        <label for="password" class="form-label fw-semibold">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
+                        <div class="invalid-feedback">Please enter password.</div>
+                    </div>
+                    <!-- Confirm Password -->
+                    <div class="col-md-6">
+                        <label for="confirm_password" class="form-label fw-semibold">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Verify password" required>
+                        <div class="invalid-feedback">Please verify password.</div>
+                    </div>
+                </div>
+                
+                <!-- Terms Check -->
+                <div class="mb-4 form-check">
+                    <input type="checkbox" class="form-check-input" id="agree" name="agree" required>
+                    <label class="form-check-label text-muted" for="agree">I agree to the Terms of Service and Privacy Policy</label>
+                    <div class="invalid-feedback">You must agree before registering.</div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between gap-3">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-success px-5 text-white fw-bold">Register Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Client-side Bootstrap validation
+(function () {
+  'use strict'
+  var forms = document.querySelectorAll('.needs-validation')
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}

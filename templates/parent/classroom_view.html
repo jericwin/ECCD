@@ -1,0 +1,129 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}{{ classroom.name }} - Parent Dashboard{% endblock %}
+
+{% block header %}{{ classroom.name }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-4">
+    <a href="{{ url_for('parent.enroll') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back to Classrooms</a>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+    {% if classroom.banner %}
+    <img src="{{ url_for('static', filename='uploads/classrooms/' + classroom.banner) }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Banner">
+    {% else %}
+    <div class="bg-{{ classroom.theme_color }} card-img-top d-flex align-items-center justify-content-center" style="height: 200px;">
+        <i class="fas fa-chalkboard text-white" style="font-size: 5rem;"></i>
+    </div>
+    {% endif %}
+    <div class="card-body p-4 position-relative">
+        <h3 class="fw-bold mb-1">{{ classroom.name }}</h3>
+        <p class="text-muted mb-2"><i class="fas fa-user-tie me-2"></i>{{ classroom.teacher_name }} | <i class="fas fa-book me-2"></i>{{ classroom.subject }}</p>
+        <p class="mb-0">{{ classroom.description }}</p>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="classroomTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="classwork-tab" data-bs-toggle="tab" data-bs-target="#classwork" type="button" role="tab" aria-controls="classwork" aria-selected="true"><i class="bi bi-journal-text me-2"></i>Classwork & Grades</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false"><i class="bi bi-calendar-check me-2"></i>Attendance</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="classroomTabsContent">
+    <!-- Classwork Tab -->
+    <div class="tab-pane fade show active" id="classwork" role="tabpanel" aria-labelledby="classwork-tab">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-4">Classwork</h5>
+                {% if classwork %}
+                    <div class="list-group list-group-flush">
+                    {% for cw in classwork %}
+                        <div class="list-group-item px-0 py-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">
+                                        <a href="{{ url_for('parent.classwork_submission', classwork_id=cw.id) }}" class="text-decoration-none text-dark d-flex align-items-center">
+                                            {{ cw.title }} <span class="badge bg-secondary ms-2">{{ cw.type|title }}</span>
+                                            <i class="bi bi-box-arrow-up-right ms-2 text-primary small"></i>
+                                        </a>
+                                    </h6>
+                                    <p class="mb-1 text-muted small">{{ cw.subject_folder }}</p>
+                                    <p class="mb-1">{{ cw.description }}</p>
+                                    {% if cw.file_path %}
+                                        <a href="{{ url_for('static', filename='uploads/classwork/' + cw.file_path) }}" class="btn btn-sm btn-outline-primary mt-2" target="_blank"><i class="bi bi-file-earmark-arrow-down me-1"></i> View Attachment</a>
+                                    {% endif %}
+                                </div>
+                                <div class="text-end" style="min-width: 150px;">
+                                    {% if cw.score is not none %}
+                                        <div class="fs-4 fw-bold text-success">{{ cw.score }} / 100</div>
+                                        <div class="text-muted small">Graded on {{ cw.graded_at.strftime('%b %d, %Y') if cw.graded_at else '' }}</div>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border">Not Graded</span>
+                                    {% endif %}
+                                    {% if cw.remarks %}
+                                        <div class="small mt-1 text-secondary fst-italic">"{{ cw.remarks }}"</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-journal-x text-muted fs-1 mb-2"></i>
+                        <p class="text-muted">No classwork has been posted yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Tab -->
+    <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-4">Attendance History</h5>
+                {% if attendance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for att in attendance %}
+                                <tr>
+                                    <td>{{ att.date.strftime('%B %d, %Y') if att.date else '' }}</td>
+                                    <td>
+                                        {% if att.status == 'present' %}
+                                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Present</span>
+                                        {% elif att.status == 'absent' %}
+                                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Absent</span>
+                                        {% elif att.status == 'tardy' %}
+                                            <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i> Tardy</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ att.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
+                        <p class="text-muted">No attendance records found for this classroom.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

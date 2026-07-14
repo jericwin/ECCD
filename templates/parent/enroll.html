@@ -1,0 +1,65 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Find Classroom - Parent Dashboard{% endblock %}
+
+{% block header %}Find Classroom{% endblock %}
+
+{% block dashboard_content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="GET" action="{{ url_for('parent.enroll') }}" class="d-flex">
+            <input type="text" name="q" class="form-control me-2" placeholder="Search classrooms or teachers..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% if classrooms %}
+        {% for cls in classrooms %}
+        <div class="col-md-4 mb-4">
+            {% if cls.is_enrolled %}
+            <a href="{{ url_for('parent.classroom_view', classroom_id=cls.id) }}" class="text-decoration-none text-dark d-block h-100">
+            {% endif %}
+            <div class="card h-100 shadow-sm {% if cls.is_enrolled %}border-{{ cls.theme_color }} border-2{% endif %}">
+                {% if cls.banner %}
+                <img src="{{ url_for('static', filename='uploads/classrooms/' + cls.banner) }}" class="card-img-top" alt="Classroom Banner" style="height: 150px; object-fit: cover;">
+                {% else %}
+                <div class="bg-{{ cls.theme_color }} card-img-top d-flex align-items-center justify-content-center" style="height: 150px;">
+                    <i class="fas fa-chalkboard text-white" style="font-size: 4rem;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-{{ cls.theme_color }}">{{ cls.name }}</h5>
+                    <p class="card-text text-muted mb-2"><i class="fas fa-book me-1"></i> {{ cls.subject }}</p>
+                    <p class="card-text mb-2"><i class="fas fa-user-tie me-1"></i> {{ cls.teacher_name }}</p>
+                    <p class="card-text mb-3"><i class="fas fa-building me-1"></i> {{ cls.center_name }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">{{ cls.learners_count }} / {{ cls.max_learners }} Learners</small>
+                        {% if cls.is_enrolled %}
+                            <span class="badge bg-success">Enrolled</span>
+                        {% elif cls.request_status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending Request</span>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('parent.enroll') }}" class="d-inline">
+                                <input type="hidden" name="classroom_id" value="{{ cls.id }}">
+                                <button type="submit" class="btn btn-sm btn-{{ cls.theme_color }}">Request to Join</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if cls.is_enrolled %}
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No classrooms found.</h4>
+        <p class="text-muted">Try a different search or wait for teachers to publish classrooms.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

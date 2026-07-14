@@ -1,0 +1,190 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">ECCD Predictive Analytics Dashboard</h3>
+    <span class="badge bg-success p-2"><i class="bi bi-cpu-fill me-1"></i> Real-time Risk Assessment Enabled</span>
+</div>
+
+<!-- Summary Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm bg-white h-100">
+            <div class="d-flex align-items-center">
+                <div class="p-3 bg-light-subtle text-primary border rounded-3 me-3 fs-3">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 0.75rem;">Total Active Students</small>
+                    <span class="fs-3 fw-bold text-dark">{{ total_learners }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm bg-white h-100">
+            <div class="d-flex align-items-center">
+                <div class="p-3 bg-light-subtle {% if at_risk_count > 0 %}text-danger{% else %}text-success{% endif %} border rounded-3 me-3 fs-3">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 0.75rem;">At-Risk Students Flagged</small>
+                    <span class="fs-3 fw-bold text-dark">{{ at_risk_count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm bg-white h-100">
+            <div class="d-flex align-items-center">
+                <div class="p-3 bg-light-subtle text-success border rounded-3 me-3 fs-3">
+                    <i class="bi bi-shield-heart"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 0.75rem;">Total Classrooms Monitored</small>
+                    <span class="fs-3 fw-bold text-dark">{{ classroom_attendance | length }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- AT-RISK ALERTS BOX -->
+    <div class="col-lg-7">
+        <div class="card p-4 border-0 shadow-sm bg-white h-100">
+            <h5 class="fw-bold mb-3 text-danger"><i class="bi bi-shield-exclamation me-1"></i>Active Support & Risk Alerts</h5>
+            <p class="text-muted small mb-4">Students listed here have triggered automatic alerts based on attendance rates (&lt;85%), growth indicators (Underweight/Obese BMI), or low grades (&lt;75%).</p>
+            
+            {% if at_risk_learners %}
+                <div class="list-group list-group-flush">
+                    {% for l in at_risk_learners %}
+                        <div class="list-group-item border-bottom py-3 px-0">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold mb-0 text-dark">{{ l.full_name }}</h6>
+                                <span class="badge bg-light text-success border small">{{ l.classroom_name }}</span>
+                            </div>
+                            <small class="text-muted d-block mb-2">LRN: <code>{{ l.learner_id }}</code> | Parent: {{ l.parent_name }}</small>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for reason in l.risk_reasons %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle p-1.5" style="font-size: 0.75rem;">
+                                        <i class="bi bi-exclamation-circle-fill me-1"></i>{{ reason }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-emoji-laughing text-success" style="font-size: 3.5rem;"></i>
+                    <p class="text-success fw-bold mt-2">Zero Alerts Flagged</p>
+                    <p class="text-muted small mb-0">All active learners meet or exceed developmental targets.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- GRAPH VISUALIZATIONS -->
+    <div class="col-lg-5">
+        <div class="row g-4">
+            <!-- BMI Distribution Chart Card -->
+            <div class="col-12">
+                <div class="card p-3 border-0 shadow-sm bg-white">
+                    <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-heart-pulse-fill text-success me-1"></i>Nutritional Status Distribution</h6>
+                    <div style="height: 200px; position: relative;">
+                        <canvas id="bmiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Classroom Attendance Comparison Card -->
+            <div class="col-12">
+                <div class="card p-3 border-0 shadow-sm bg-white">
+                    <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-calendar-check-fill text-primary me-1"></i>Attendance Comparison (%)</h6>
+                    <div style="height: 180px; position: relative;">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. BMI Distribution Chart
+    var bmiCtx = document.getElementById('bmiChart').getContext('2d');
+    var bmiData = {
+        labels: ['Normal', 'Underweight', 'Overweight', 'Obese'],
+        datasets: [{
+            data: [
+                {{ bmi_distribution.Normal }},
+                {{ bmi_distribution.Underweight }},
+                {{ bmi_distribution.Overweight }},
+                {{ bmi_distribution.Obese }}
+            ],
+            backgroundColor: ['#28a745', '#ffc107', '#fd7e14', '#dc3545'],
+            borderWidth: 1
+        }]
+    };
+    new Chart(bmiCtx, {
+        type: 'doughnut',
+        data: bmiData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { boxWidth: 12, font: { family: 'Quicksand' } }
+                }
+            }
+        }
+    });
+
+    // 2. Attendance Comparison Chart
+    var attCtx = document.getElementById('attendanceChart').getContext('2d');
+    
+    var classroomsList = [];
+    var attendanceRates = [];
+    {% for ca in classroom_attendance %}
+        classroomsList.push("{{ ca.name }}");
+        attendanceRates.push({{ ca.rate }});
+    {% endfor %}
+    
+    new Chart(attCtx, {
+        type: 'bar',
+        data: {
+            labels: classroomsList,
+            datasets: [{
+                label: 'Attendance Rate (%)',
+                data: attendanceRates,
+                backgroundColor: '#198754',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { font: { family: 'Quicksand' } }
+                },
+                x: { ticks: { font: { family: 'Quicksand' } } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

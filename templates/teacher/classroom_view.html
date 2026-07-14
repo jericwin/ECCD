@@ -1,0 +1,484 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<!-- Classroom Header Banner -->
+<div class="card bg-{{ classroom.theme_color or 'success' }} text-white p-4 p-md-5 rounded-4 shadow-sm border-0 mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <span class="badge bg-white text-{{ classroom.theme_color or 'success' }} mb-2 fw-bold">{{ classroom.school_year }}</span>
+            <h1 class="display-6 fw-bold mb-1">{{ classroom.name }}</h1>
+            <p class="lead mb-0">{{ classroom.subject }} | {{ classroom.age_group }} Group</p>
+            <small class="d-block opacity-75 mt-2"><i class="bi bi-clock me-1"></i>{{ classroom.schedule }}</small>
+            <div class="mt-3">
+                <a href="{{ url_for('teacher.record_attendance', classroom_id=classroom.id) }}" class="btn btn-sm btn-light text-success fw-bold">
+                    <i class="bi bi-calendar-check me-1"></i> Record Attendance
+                </a>
+            </div>
+        </div>
+        <div class="fs-1 d-none d-sm-block">
+            <i class="bi bi-rocket-takeoff-fill" style="font-size: 4rem;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Control -->
+<ul class="nav nav-tabs border-bottom mb-4" id="insideClassroomTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-bold text-success" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard-panel" type="button" role="tab" aria-controls="dashboard-panel" aria-selected="true">
+            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold text-muted" id="stream-tab" data-bs-toggle="tab" data-bs-target="#stream-panel" type="button" role="tab" aria-controls="stream-panel" aria-selected="false">
+            <i class="bi bi-broadcast me-1"></i> Stream
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold text-muted" id="classwork-tab" data-bs-toggle="tab" data-bs-target="#classwork-panel" type="button" role="tab" aria-controls="classwork-panel" aria-selected="false">
+            <i class="bi bi-journal-text me-1"></i> Classwork
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold text-muted" id="learners-tab" data-bs-toggle="tab" data-bs-target="#learners-panel" type="button" role="tab" aria-controls="learners-panel" aria-selected="false">
+            <i class="bi bi-people me-1"></i> Learners ({{ enrolled_learners | length }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold text-muted" id="grades-tab" data-bs-toggle="tab" data-bs-target="#grades-panel" type="button" role="tab" aria-controls="grades-panel" aria-selected="false">
+            <i class="bi bi-award me-1"></i> Grades & Progress
+        </button>
+    </li>
+</ul>
+
+<!-- Tabs Content Panels -->
+<div class="tab-content" id="insideClassroomTabsContent">
+    
+    <!-- 0. DASHBOARD PANEL -->
+    <div class="tab-pane fade show active" id="dashboard-panel" role="tabpanel" aria-labelledby="dashboard-tab">
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card bg-success-subtle border-0 p-4 rounded-4 shadow-sm h-100">
+                    <h6 class="text-success text-uppercase fw-bold small mb-2"><i class="bi bi-people-fill me-2"></i>Enrolled Learners</h6>
+                    <h2 class="display-6 fw-bold text-success mb-0">{{ enrolled_learners | length }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary-subtle border-0 p-4 rounded-4 shadow-sm h-100">
+                    <h6 class="text-primary text-uppercase fw-bold small mb-2"><i class="bi bi-journal-check me-2"></i>Total Classwork</h6>
+                    <h2 class="display-6 fw-bold text-primary mb-0">{{ classwork | length }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning-subtle border-0 p-4 rounded-4 shadow-sm h-100">
+                    <h6 class="text-warning text-uppercase fw-bold small mb-2"><i class="bi bi-card-checklist me-2"></i>Pending to Grade</h6>
+                    <h2 class="display-6 fw-bold text-warning mb-0">{{ recent_submissions | length }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border border-light-subtle shadow-sm p-4 h-100 bg-white">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-calendar-event text-danger me-2"></i>Upcoming Deadlines</h5>
+                    {% if upcoming_classwork %}
+                        <div class="list-group list-group-flush">
+                            {% for cw in upcoming_classwork %}
+                                <a href="{{ url_for('teacher.classwork_submissions', classwork_id=cw.id) }}" class="list-group-item list-group-item-action px-0 border-bottom py-3">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <h6 class="mb-1 fw-bold text-dark">{{ cw.title }}</h6>
+                                        <span class="badge bg-danger-subtle text-danger">{{ cw.due_date.strftime('%b %d') }}</span>
+                                    </div>
+                                    <small class="text-muted">{{ cw.subject_folder }} &bull; {{ cw.type | capitalize }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle text-success fs-1"></i>
+                            <p class="text-muted mt-2">No upcoming deadlines.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border border-light-subtle shadow-sm p-4 h-100 bg-white">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-inbox text-primary me-2"></i>Recent Submissions</h5>
+                    {% if recent_submissions %}
+                        <div class="list-group list-group-flush">
+                            {% for sub in recent_submissions %}
+                                <a href="{{ url_for('teacher.classwork_submissions', classwork_id=sub.classwork_id) }}" class="list-group-item list-group-item-action px-0 border-bottom py-3">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <h6 class="mb-1 fw-bold text-dark">{{ sub.full_name }}</h6>
+                                        <small class="text-muted">{{ sub.submitted_at.strftime('%b %d, %I:%M %p') }}</small>
+                                    </div>
+                                    <small class="text-primary fw-semibold">Turned in: {{ sub.title }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox text-muted fs-1"></i>
+                            <p class="text-muted mt-2">No ungraded submissions.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 1. STREAM PANEL -->
+    <div class="tab-pane fade" id="stream-panel" role="tabpanel" aria-labelledby="stream-tab">
+        <div class="row">
+            <!-- Left Side: Post Announcement Form -->
+            <div class="col-lg-4 mb-4">
+                <div class="card p-3 border border-light-subtle shadow-sm">
+                    <h5 class="fw-bold mb-3 text-success"><i class="bi bi-pencil-square me-1"></i>Post to Stream</h5>
+                    
+                    <form action="{{ url_for('teacher.post_stream', classroom_id=classroom.id) }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="type" class="form-label small fw-semibold text-muted">Post Category</label>
+                            <select class="form-select form-select-sm" id="type" name="type" required>
+                                <option value="announcement" selected>Announcement</option>
+                                <option value="reminder">Activity Reminder</option>
+                                <option value="material">Learning Resource</option>
+                                <option value="event">Upcoming Event</option>
+                                <option value="notice">Parent Notice</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="title" class="form-label small fw-semibold text-muted">Topic / Title</label>
+                            <input type="text" class="form-control form-control-sm" id="title" name="title" placeholder="E.g., Field Trip Details" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label small fw-semibold text-muted">Content</label>
+                            <textarea class="form-control form-control-sm" id="content" name="content" rows="3" placeholder="Write message..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="file" class="form-label small fw-semibold text-muted">Attach File / Photo</label>
+                            <input type="file" class="form-control form-control-sm" id="file" name="file">
+                        </div>
+                        <div class="mb-3 form-check small">
+                            <input type="checkbox" class="form-check-input" id="is_pinned" name="is_pinned">
+                            <label class="form-check-label text-muted" for="is_pinned">Pin to top of stream</label>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-sm w-100 text-white fw-bold">Post Announcement</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Right Side: Stream List -->
+            <div class="col-lg-8">
+                {% if posts %}
+                    <!-- Render Pinned Posts First -->
+                    {% for post in posts %}
+                        {% if post.is_pinned %}
+                            <div class="card border border-warning shadow-sm mb-3 bg-warning-subtle" style="border-left: 5px solid #ffc107 !important;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-pin-angle-fill me-1"></i>PINNED ANNOUNCEMENT</span>
+                                        <small class="text-muted">{{ post.created_at.strftime('%b %d, %Y %I:%M %p') }}</small>
+                                    </div>
+                                    <h5 class="fw-bold mb-1">{{ post.title }}</h5>
+                                    <p class="card-text text-dark">{{ post.content }}</p>
+                                    
+                                    {% if post.file_path %}
+                                        <div class="mt-2 p-2 bg-white rounded border d-flex align-items-center">
+                                            <i class="bi bi-file-earmark-arrow-down-fill text-danger fs-3 me-2"></i>
+                                            <a href="{{ url_for('static', filename='uploads/posts/' + post.file_path) }}" target="_blank" class="text-decoration-none text-primary small fw-bold">Download Attachment</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Render Standard Posts -->
+                    {% for post in posts %}
+                        {% if not post.is_pinned %}
+                            <div class="card border border-light-subtle shadow-sm mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">{{ post.type | capitalize }}</span>
+                                        <small class="text-muted">{{ post.created_at.strftime('%b %d, %Y %I:%M %p') }}</small>
+                                    </div>
+                                    <h5 class="fw-bold mb-1">{{ post.title }}</h5>
+                                    <p class="card-text text-muted">{{ post.content }}</p>
+                                    
+                                    {% if post.file_path %}
+                                        <div class="mt-2 p-2 bg-light rounded border d-flex align-items-center">
+                                            <i class="bi bi-file-earmark-arrow-down-fill text-primary fs-3 me-2"></i>
+                                            <a href="{{ url_for('static', filename='uploads/posts/' + post.file_path) }}" target="_blank" class="text-decoration-none text-primary small fw-semibold">Download Attachment</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 bg-white rounded shadow-sm border">
+                        <i class="bi bi-chat-left-dots text-muted fs-1"></i>
+                        <p class="text-muted mt-2 mb-0">No posts in this classroom stream yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 2. CLASSWORK PANEL -->
+    <div class="tab-pane fade" id="classwork-panel" role="tabpanel" aria-labelledby="classwork-tab">
+        <div class="row">
+            <!-- Left Column: Folders navigation -->
+            <div class="col-md-4 mb-4">
+                <div class="card p-3 border border-light-subtle shadow-sm">
+                    <h5 class="fw-bold text-success mb-3"><i class="bi bi-folder-fill me-1"></i>Subject Folders</h5>
+                    <div class="list-group list-group-flush" id="folderList" role="tablist">
+                        {% for folder in ['Mathematics', 'English', 'Mother Tongue', 'Filipino', 'Science', 'Drawing', 'Storytelling'] %}
+                            <a class="list-group-item list-group-item-action border-0 py-2.5 rounded-3 my-1 fw-semibold {% if loop.first %}active bg-success text-white{% endif %}" id="folder-{{ loop.index }}-list" data-bs-toggle="list" href="#folder-{{ loop.index }}" role="tab" aria-controls="folder-{{ loop.index }}">
+                                <i class="bi bi-folder2-open me-2"></i> {{ folder }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Upload classwork form -->
+                    <div class="border-top pt-3 mt-4">
+                        <h6 class="fw-bold mb-2">Upload Activity / Worksheet</h6>
+                        <form action="{{ url_for('teacher.create_classwork', classroom_id=classroom.id) }}" method="POST" enctype="multipart/form-data">
+                            <div class="mb-2">
+                                <label for="classwork_folder" class="form-label small text-muted mb-1">Target Folder</label>
+                                <select class="form-select form-select-sm" id="classwork_folder" name="subject_folder" required>
+                                    {% for folder in ['Mathematics', 'English', 'Mother Tongue', 'Filipino', 'Science', 'Drawing', 'Storytelling'] %}
+                                        <option value="{{ folder }}">{{ folder }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label for="classwork_title" class="form-label small text-muted mb-1">Title</label>
+                                <input type="text" class="form-control form-control-sm" id="classwork_title" name="title" placeholder="Worksheet name" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="classwork_type" class="form-label small text-muted mb-1">Activity Type</label>
+                                <select class="form-select form-select-sm" id="classwork_type" name="type" required>
+                                    <option value="worksheet" selected>Worksheet</option>
+                                    <option value="assignment">Assignment</option>
+                                    <option value="activity">Drawing / Play Activity</option>
+                                    <option value="assessment">Graded Assessment</option>
+                                    <option value="material">Reading Material</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label for="classwork_desc" class="form-label small text-muted mb-1">Description</label>
+                                <textarea class="form-control form-control-sm" id="classwork_desc" name="description" rows="2" placeholder="Instructions..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <label for="classwork_due_date" class="form-label small text-muted mb-1">Due Date (Optional)</label>
+                                <input type="date" class="form-control form-control-sm" id="classwork_due_date" name="due_date">
+                            </div>
+                            <div class="mb-3">
+                                <label for="classwork_file" class="form-label small text-muted mb-1">Attach Resource File</label>
+                                <input type="file" class="form-control form-control-sm" id="classwork_file" name="file">
+                            </div>
+                            <button type="submit" class="btn btn-outline-success btn-sm w-100">Upload to Folder</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Folder files display -->
+            <div class="col-md-8">
+                <div class="tab-content" id="nav-tabContent">
+                    {% for folder in ['Mathematics', 'English', 'Mother Tongue', 'Filipino', 'Science', 'Drawing', 'Storytelling'] %}
+                        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="folder-{{ loop.index }}" role="tabpanel" aria-labelledby="folder-{{ loop.index }}-list">
+                            <div class="card p-4 border border-light-subtle shadow-sm bg-white">
+                                <h5 class="fw-bold mb-3 border-bottom pb-2 text-dark"><i class="bi bi-folder-symlink-fill text-warning me-2"></i>{{ folder }} Portal</h5>
+                                
+                                {% set folder_work = classwork | selectattr('subject_folder', 'equalto', folder) | list %}
+                                {% if folder_work %}
+                                    <div class="list-group list-group-flush">
+                                        {% for item in folder_work %}
+                                            <div class="list-group-item border-bottom py-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="fw-bold text-success mb-0">{{ item.title }}</h6>
+                                                    <div>
+                                                        <span class="badge bg-light text-dark border small me-2">{{ item.type | capitalize }}</span>
+                                                        <a href="{{ url_for('teacher.classwork_submissions', classwork_id=item.id) }}" class="btn btn-sm btn-outline-success rounded-pill fw-semibold" style="font-size: 0.75rem;"><i class="bi bi-people me-1"></i>View Submissions</a>
+                                                    </div>
+                                                </div>
+                                                <p class="text-muted small mb-2">{{ item.description or 'No instructions provided.' }}</p>
+                                                {% if item.due_date %}
+                                                <p class="text-danger small mb-2 fw-semibold"><i class="bi bi-calendar-x me-1"></i>Due: {{ item.due_date.strftime('%B %d, %Y') }}</p>
+                                                {% endif %}
+                                                {% if item.file_path %}
+                                                    <div class="d-flex align-items-center p-2 bg-light rounded border">
+                                                        <i class="bi bi-file-earmark-pdf-fill text-danger fs-4 me-2"></i>
+                                                        <a href="{{ url_for('static', filename='uploads/classwork/' + item.file_path) }}" target="_blank" class="text-decoration-none text-primary small fw-semibold">Download Resource</a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-journals text-muted" style="font-size: 2.5rem;"></i>
+                                        <p class="text-muted mt-2 mb-0">No activities or worksheets uploaded to {{ folder }} yet.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 3. LEARNERS PANEL -->
+    <div class="tab-pane fade" id="learners-panel" role="tabpanel" aria-labelledby="learners-tab">
+        <div class="row">
+            <!-- Left Side: Assigned Learners List -->
+            <div class="col-lg-8 mb-4">
+                <div class="card p-4 border border-light-subtle shadow-sm bg-white">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-people-fill text-success me-2"></i>Assigned Learners</h5>
+                    
+                    {% if enrolled_learners %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Learner Photo</th>
+                                        <th>Full Name</th>
+                                        <th>Learner ID (LRN)</th>
+                                        <th>Parent/Guardian</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for enrolled in enrolled_learners %}
+                                        <tr>
+                                            <td>
+                                                {% if enrolled.photo %}
+                                                    <img src="{{ url_for('static', filename='uploads/learners/' + enrolled.photo) }}" alt="Learner photo" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                                {% else %}
+                                                    <i class="bi bi-person-bounding-box text-secondary fs-3"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td class="fw-bold">{{ enrolled.full_name }}</td>
+                                            <td><code>{{ enrolled.learner_id }}</code></td>
+                                            <td>
+                                                <small class="fw-semibold">{{ enrolled.parent_name }}</small><br>
+                                                <small class="text-muted">{{ enrolled.relationship }}</small>
+                                            </td>
+                                            <td>
+                                                <form action="{{ url_for('teacher.remove_learner', classroom_id=classroom.id, learner_id=enrolled.id) }}" method="POST" onsubmit="return confirm('Remove this child from the classroom?');">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-person-dash"></i> Remove</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2 mb-0">No learners enrolled in this classroom yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Side: Assign Unassigned Learners Form -->
+            <div class="col-lg-4">
+                <div class="card p-3 border border-light-subtle shadow-sm bg-white">
+                    <h5 class="fw-bold text-success mb-3"><i class="bi bi-person-plus-fill me-1"></i>Enroll Learner</h5>
+                    
+                    {% if unassigned_learners %}
+                        <form action="{{ url_for('teacher.assign_learner', classroom_id=classroom.id) }}" method="POST">
+                            <div class="mb-3">
+                                <label for="learner_select" class="form-label small text-muted">Select Child to Enroll</label>
+                                <select class="form-select form-select-sm" id="learner_select" name="learner_id" required>
+                                    <option value="" disabled selected>Select from records...</option>
+                                    {% for u in unassigned_learners %}
+                                        <option value="{{ u.id }}">{{ u.full_name }} (LRN: {{ u.learner_id }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm w-100 text-white">Enroll in Class</button>
+                        </form>
+                    {% else %}
+                        <div class="text-center py-4 bg-light rounded">
+                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                            <p class="text-muted small mt-2 mb-0">All registered learners are already enrolled in this class or another class.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 4. GRADES PANEL -->
+    <div class="tab-pane fade" id="grades-panel" role="tabpanel" aria-labelledby="grades-tab">
+        <div class="card p-4 border border-light-subtle shadow-sm bg-white">
+            <h5 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-award-fill text-success me-2"></i>Assessment Scores & Learning Progress</h5>
+            
+            {% if enrolled_learners %}
+                <form action="{{ url_for('teacher.save_grades', classroom_id=classroom.id) }}" method="POST">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Learner Name</th>
+                                    <th>LRN</th>
+                                    {% set assessments_list = classwork | selectattr('type', 'equalto', 'assessment') | list %}
+                                    {% if assessments_list %}
+                                        {% for ass in assessments_list %}
+                                            <th class="text-center" style="min-width: 160px;">{{ ass.title }}</th>
+                                        {% endfor %}
+                                    {% else %}
+                                        <th class="text-center text-muted">No assessments posted</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enrolled in enrolled_learners %}
+                                    <tr>
+                                        <td class="fw-bold">{{ enrolled.full_name }}</td>
+                                        <td><code>{{ enrolled.learner_id }}</code></td>
+                                        
+                                        {% if assessments_list %}
+                                            {% for ass in assessments_list %}
+                                                <td>
+                                                    {% set grade = grades_dict.get((enrolled.id, ass.id)) %}
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <div class="input-group input-group-sm mb-1" style="width: 90px;">
+                                                            <span class="input-group-text bg-light text-muted" style="font-size: 0.7rem;">Score</span>
+                                                            <input type="number" class="form-control text-center" name="score_{{ enrolled.id }}_{{ ass.id }}" value="{% if grade and grade.score is not none %}{{ grade.score }}{% endif %}" min="0">
+                                                        </div>
+                                                        <input type="text" class="form-control form-control-sm" name="remarks_{{ enrolled.id }}_{{ ass.id }}" value="{% if grade %}{{ grade.remarks or '' }}{% endif %}" placeholder="Observation note..." style="font-size: 0.75rem;">
+                                                    </div>
+                                                </td>
+                                            {% endfor %}
+                                        {% else %}
+                                            <td class="text-center text-muted">-</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if assessments_list %}
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-success text-white fw-bold"><i class="bi bi-save me-1"></i> Save Assessment Marks</button>
+                        </div>
+                    {% endif %}
+                </form>
+            {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted">No learners enrolled to view progress logs.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

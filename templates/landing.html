@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome - ECCD Monitoring & Analytics{% endblock %}
+
+{% block content %}
+<div class="row align-items-center justify-content-center py-5">
+    <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+        <div class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill mb-3">
+            <i class="bi bi-balloon-fill me-1 text-danger"></i> Preschool Care & Development
+        </div>
+        <h1 class="display-4 fw-bold mb-3" style="color: #2c3e50;">
+            ECCD Web-Based <br>
+            <span class="text-success">Monitoring System</span>
+        </h1>
+        <p class="lead text-muted mb-4">
+            Enabling teachers and parents to seamlessly monitor children's attendance, health status (BMI), learning
+            progress, and classroom activities. Empowered with predictive data analytics for early risk identification.
+        </p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-success btn-lg px-4 shadow-sm">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Get Started / Login
+            </a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary btn-lg dropdown-toggle px-4"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-plus-fill me-2"></i> Create Account
+                </button>
+                <ul class="dropdown-menu shadow border-0" style="border-radius: 12px;">
+                    <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_teacher') }}"><i
+                                class="bi bi-person-workspace text-primary me-2"></i>Register as Teacher</a></li>
+                    <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_parent') }}"><i
+                                class="bi bi-people-fill text-success me-2"></i>Register as Parent</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-8 col-sm-10 text-center">
+        <!-- SVG or CSS graphic for welcome illustration -->
+        <div class="card p-5 bg-white border border-light-subtle shadow-sm" style="border-radius: 24px;">
+            <div class="mb-4">
+                <i class="bi bi-rocket-takeoff text-warning" style="font-size: 6rem;"></i>
+            </div>
+            <h4 class="fw-bold mb-2">Welcome to ECCD Portal</h4>
+            <p class="text-muted">A dedicated tool for teachers and parents to nurture and monitor early childhood
+                milestones.</p>
+            <div class="row g-3 mt-2 text-start">
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
+                        <i class="bi bi-calendar-check-fill text-primary fs-3 me-2"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Attendance</h6>
+                            <small class="text-muted">Daily tracking</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
+                        <i class="bi bi-heart-pulse-fill text-danger fs-3 me-2"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold">BMI & Health</h6>
+                            <small class="text-muted">Growth records</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
+                        <i class="bi bi-journal-bookmark-fill text-success fs-3 me-2"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Classwork</h6>
+                            <small class="text-muted">Daily activities</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
+                        <i class="bi bi-graph-up-arrow text-warning fs-3 me-2"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Analytics</h6>
+                            <small class="text-muted">At-risk predictions</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

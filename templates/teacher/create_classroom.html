@@ -1,0 +1,114 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="card p-4 p-md-5 border-0 shadow-sm bg-white">
+    <div class="border-bottom pb-2 mb-4">
+        <h3 class="fw-bold mb-1"><i class="bi bi-plus-circle-fill text-success me-2"></i>Create New Classroom</h3>
+        <p class="text-muted">Set up a new workspace for monitoring child growth and assessments</p>
+    </div>
+    
+    <form action="{{ url_for('teacher.create_classroom') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <div class="row g-3">
+            <!-- Classroom Name -->
+            <div class="col-md-6">
+                <label for="name" class="form-label fw-semibold">Classroom Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="E.g., Orchid Section, Kindergarten Rose" required>
+                <div class="invalid-feedback">Please enter classroom name.</div>
+            </div>
+            
+            <!-- Subject -->
+            <div class="col-md-6">
+                <label for="subject" class="form-label fw-semibold">Subject / Area</label>
+                <input type="text" class="form-control" id="subject" name="subject" placeholder="E.g., Early Development, Mathematics" required>
+                <div class="invalid-feedback">Please specify subject area.</div>
+            </div>
+            
+            <!-- Age Group -->
+            <div class="col-md-6">
+                <label for="age_group" class="form-label fw-semibold">Age Group</label>
+                <select class="form-select" id="age_group" name="age_group" required>
+                    <option value="" disabled selected>Select age group...</option>
+                    <option value="3-4 Years">3-4 Years</option>
+                    <option value="4-5 Years">4-5 Years</option>
+                    <option value="5-6 Years">5-6 Years</option>
+                </select>
+                <div class="invalid-feedback">Please select age group.</div>
+            </div>
+            
+            <!-- School Year -->
+            <div class="col-md-6">
+                <label for="school_year" class="form-label fw-semibold">School Year</label>
+                <input type="text" class="form-control" id="school_year" name="school_year" placeholder="E.g., 2025-2026" required>
+                <div class="invalid-feedback">Please enter school year.</div>
+            </div>
+            
+            <!-- Schedule -->
+            <div class="col-md-6">
+                <label for="schedule" class="form-label fw-semibold">Schedule</label>
+                <input type="text" class="form-control" id="schedule" name="schedule" placeholder="E.g., Mon-Fri 8:00 AM - 11:30 AM" required>
+                <div class="invalid-feedback">Please specify schedule.</div>
+            </div>
+            
+            <!-- Max Learners -->
+            <div class="col-md-6">
+                <label for="max_learners" class="form-label fw-semibold">Maximum Learners Limit</label>
+                <input type="number" class="form-control" id="max_learners" name="max_learners" value="30" min="1" max="100" required>
+                <div class="invalid-feedback">Please enter limit.</div>
+            </div>
+            
+            <!-- Theme Color -->
+            <div class="col-md-6">
+                <label for="theme_color" class="form-label fw-semibold">Theme Color Card style</label>
+                <select class="form-select" id="theme_color" name="theme_color">
+                    <option value="success" selected>Primary Green</option>
+                    <option value="primary">Sky Blue</option>
+                    <option value="warning">Pastel Yellow</option>
+                    <option value="danger">Pastel Pink</option>
+                    <option value="info">Light Cyan</option>
+                </select>
+            </div>
+            
+            <!-- Banner File -->
+            <div class="col-md-6">
+                <label for="banner" class="form-label fw-semibold">Classroom Banner Graphic</label>
+                <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
+                <small class="text-muted">Optional header graphic (JPG, PNG)</small>
+            </div>
+            
+            <!-- Description -->
+            <div class="col-12 mb-3">
+                <label for="description" class="form-label fw-semibold">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Provide class notes, center specifics, or learning goals..." required></textarea>
+                <div class="invalid-feedback">Please enter description.</div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between gap-3 border-top pt-4">
+            <a href="{{ url_for('teacher.classrooms') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+            <div class="d-flex gap-2">
+                <button type="submit" name="action" value="draft" class="btn btn-outline-success px-4">Save Draft</button>
+                <button type="submit" name="action" value="publish" class="btn btn-success px-5 text-white fw-bold">Create & Publish</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Bootstrap Validation
+(function () {
+  'use strict'
+  var forms = document.querySelectorAll('.needs-validation')
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}

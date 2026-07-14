@@ -1,0 +1,160 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">Learners Directory</h3>
+</div>
+
+<!-- Search & Filters Card -->
+<div class="card p-3 border-0 shadow-sm bg-white mb-4">
+    <form action="{{ url_for('teacher.learners') }}" method="GET" class="row g-2 align-items-end">
+        <!-- Text Search -->
+        <div class="col-md-2">
+            <label for="query" class="form-label small fw-semibold text-muted">Search</label>
+            <input type="text" class="form-control form-control-sm" id="query" name="query" placeholder="Name/LRN..." value="{{ query or '' }}">
+        </div>
+        
+        <!-- Classroom Filter -->
+        <div class="col-md-2">
+            <label for="classroom_id" class="form-label small fw-semibold text-muted">Classroom</label>
+            <select class="form-select form-select-sm" id="classroom_id" name="classroom_id">
+                <option value="">All Classrooms</option>
+                {% for c in teacher_classrooms %}
+                <option value="{{ c.id }}" {% if classroom_filter == (c.id|string) %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Gender Select -->
+        <div class="col-md-2">
+            <label for="gender" class="form-label small fw-semibold text-muted">Gender</label>
+            <select class="form-select form-select-sm" id="gender" name="gender">
+                <option value="">All</option>
+                <option value="Male" {% if gender_filter == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if gender_filter == 'Female' %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+        
+        <!-- Age Filter -->
+        <div class="col-md-2">
+            <label for="age" class="form-label small fw-semibold text-muted">Age Group</label>
+            <select class="form-select form-select-sm" id="age" name="age">
+                <option value="">All Ages</option>
+                <option value="3-4" {% if age_filter == '3-4' %}selected{% endif %}>3-4 Years</option>
+                <option value="4-5" {% if age_filter == '4-5' %}selected{% endif %}>4-5 Years</option>
+                <option value="5-6" {% if age_filter == '5-6' %}selected{% endif %}>5-6 Years</option>
+            </select>
+        </div>
+        
+        <!-- BMI Status Filter -->
+        <div class="col-md-2">
+            <label for="bmi_status" class="form-label small fw-semibold text-muted">BMI Status</label>
+            <select class="form-select form-select-sm" id="bmi_status" name="bmi_status">
+                <option value="">All Statuses</option>
+                <option value="Normal" {% if bmi_filter == 'Normal' %}selected{% endif %}>Normal</option>
+                <option value="Underweight" {% if bmi_filter == 'Underweight' %}selected{% endif %}>Underweight</option>
+                <option value="Overweight" {% if bmi_filter == 'Overweight' %}selected{% endif %}>Overweight</option>
+                <option value="Obese" {% if bmi_filter == 'Obese' %}selected{% endif %}>Obese</option>
+            </select>
+        </div>
+        
+        <!-- Attendance Filter -->
+        <div class="col-md-2">
+            <label for="attendance" class="form-label small fw-semibold text-muted">Attendance</label>
+            <select class="form-select form-select-sm" id="attendance" name="attendance">
+                <option value="">All Rates</option>
+                <option value="at-risk" {% if attendance_filter == 'at-risk' %}selected{% endif %}>At-Risk (&lt;85%)</option>
+                <option value="excellent" {% if attendance_filter == 'excellent' %}selected{% endif %}>Excellent (&ge;95%)</option>
+            </select>
+        </div>
+        
+        <!-- Filter Button -->
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-success btn-sm w-100"><i class="bi bi-funnel"></i></button>
+        </div>
+    </form>
+</div>
+
+<!-- Learners List -->
+<div class="card p-4 border-0 shadow-sm bg-white">
+    {% if learners %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Child Photo</th>
+                        <th>Full Name</th>
+                        <th>LRN / Gender</th>
+                        <th>Age (Birthdate)</th>
+                        <th>Classroom</th>
+                        <th>Attendance</th>
+                        <th>BMI Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in learners %}
+                        <tr>
+                            <td>
+                                {% if l.photo %}
+                                    <img src="{{ url_for('static', filename='uploads/learners/' + l.photo) }}" alt="Child Photo" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <i class="bi bi-person-bounding-box text-secondary fs-3"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ l.full_name }}</div>
+                                <small class="text-muted">Parent: {{ l.parent_name }}</small>
+                            </td>
+                            <td>
+                                <code>{{ l.learner_id or 'N/A' }}</code><br>
+                                <span class="badge bg-light text-dark border small">{{ l.gender }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ l.age or 'N/A' }} yrs</strong><br>
+                                <small class="text-muted">{{ l.birthdate or 'N/A' }}</small>
+                            </td>
+                            <td>
+                                {% if l.classroom_name %}
+                                    <span class="text-success fw-semibold"><i class="bi bi-houses me-1"></i>{{ l.classroom_name }}</span>
+                                {% else %}
+                                    <span class="text-muted small">Not Enrolled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold me-2">{{ l.attendance_rate }}%</span>
+                                    <span class="badge {% if l.attendance_rate < 85.0 %}bg-danger{% elif l.attendance_rate >= 95.0 %}bg-success{% else %}bg-primary{% endif %} text-white" style="font-size: 0.7rem;">
+                                        {% if l.attendance_rate < 85.0 %}At-Risk{% else %}Good{% endif %}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if l.bmi_status %}
+                                    <span class="badge {% if l.bmi_status == 'Normal' %}bg-success{% elif l.bmi_status == 'Underweight' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                        {{ l.bmi_status }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted small">No Record</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="{{ url_for('teacher.learner_health', learner_id=l.id) }}" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-heart-pulse-fill"></i> Health
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-2">No learners found matching the search criteria.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

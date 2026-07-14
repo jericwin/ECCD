@@ -1,0 +1,126 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <!-- Stat Card 1 -->
+    <div class="col-md-4">
+        <div class="card bg-primary-subtle text-primary border-0 p-4 rounded-4 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-uppercase fw-bold text-muted small mb-1">Active Classrooms</h6>
+                    <h2 class="display-6 fw-bold mb-0">{{ classrooms_count }}</h2>
+                </div>
+                <div class="fs-1"><i class="bi bi-building-fill"></i></div>
+            </div>
+            <a href="{{ url_for('teacher.classrooms') }}" class="small text-decoration-none text-primary mt-3 d-inline-block">View Details &rarr;</a>
+        </div>
+    </div>
+    
+    <!-- Stat Card 2 -->
+    <div class="col-md-4">
+        <div class="card bg-success-subtle text-success border-0 p-4 rounded-4 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-uppercase fw-bold text-muted small mb-1">Total Learners</h6>
+                    <h2 class="display-6 fw-bold mb-0">{{ learners_count }}</h2>
+                </div>
+                <div class="fs-1"><i class="bi bi-people-fill"></i></div>
+            </div>
+            <span class="small text-muted mt-3 d-inline-block">Enrolled in classes</span>
+        </div>
+    </div>
+
+    <!-- Stat Card 3 -->
+    <div class="col-md-4">
+        <div class="card bg-warning-subtle text-warning border-0 p-4 rounded-4 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-uppercase fw-bold text-muted small mb-1">Announcements</h6>
+                    <h2 class="display-6 fw-bold mb-0">{{ announcements_count }}</h2>
+                </div>
+                <div class="fs-1"><i class="bi bi-megaphone-fill"></i></div>
+            </div>
+            <span class="small text-muted mt-3 d-inline-block">Active posts</span>
+        </div>
+    </div>
+</div>
+
+<!-- Profile details card -->
+<div class="card p-4 border-0 shadow-sm bg-white mb-4">
+    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-shield-lock-fill text-warning me-2"></i>Teacher Profile Summary</h5>
+    <div class="row g-3">
+        <div class="col-md-4 text-center">
+            {% if teacher.profile_photo %}
+                <img src="{{ url_for('static', filename='uploads/teachers/' + teacher.profile_photo) }}" alt="Profile Photo" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+            {% else %}
+                <i class="bi bi-person-circle text-secondary" style="font-size: 7rem;"></i>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle">
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold text-muted" style="width: 180px;">Full Name:</td>
+                            <td class="fw-bold">{{ teacher.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Employee ID:</td>
+                            <td><code>{{ teacher.employee_id }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Position:</td>
+                            <td>{{ teacher.position }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Development Center:</td>
+                            <td><span class="badge bg-success">{{ teacher.center_name }}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Mobile Number:</td>
+                            <td>{{ teacher.mobile }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Complete Address:</td>
+                            <td>{{ teacher.address }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Classrooms Overview -->
+<div class="card p-4 border-0 shadow-sm bg-white">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-grid-fill text-success me-2"></i>My Classrooms</h5>
+        <a href="{{ url_for('teacher.create_classroom') }}" class="btn btn-sm btn-success text-white"><i class="bi bi-plus-circle me-1"></i>Create Classroom</a>
+    </div>
+    
+    {% if classrooms %}
+        <div class="row g-3">
+            {% for classroom in classrooms %}
+                <div class="col-md-6">
+                    <div class="card border border-light-subtle h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-1 text-{{ classroom.theme_color or 'success' }}">{{ classroom.name }}</h6>
+                            <p class="text-muted small mb-2">{{ classroom.subject or 'General Class' }}</p>
+                            <small class="d-block text-muted mb-3"><i class="bi bi-calendar-event me-1"></i>{{ classroom.schedule or 'No Schedule' }}</small>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-dark border"><i class="bi bi-people me-1"></i>{{ classroom.learners_count or 0 }} enrolled</span>
+                                <a href="{{ url_for('teacher.classroom_view', classroom_id=classroom.id) }}" class="btn btn-sm btn-outline-success">Open Class</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-journal-x text-muted fs-2"></i>
+            <p class="text-muted mt-2">No classrooms created yet. Get started by creating one!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<!-- Search & Setup Form - Hidden on Print -->
+<div class="card p-4 border-0 shadow-sm bg-white mb-4 no-print">
+    <h4 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-file-earmark-bar-graph-fill text-success me-2"></i>Report Generator Center</h4>
+    
+    <form method="GET" action="{{ url_for('teacher.reports') }}" class="row g-3">
+        <!-- Classroom Selector -->
+        <div class="col-md-5">
+            <label for="classroom_id" class="form-label fw-semibold text-muted">Select Classroom</label>
+            <select class="form-select" id="classroom_id" name="classroom_id" required>
+                <option value="" disabled {% if not selected_classroom %}selected{% endif %}>Choose classroom...</option>
+                {% for c in classrooms %}
+                    <option value="{{ c.id }}" {% if selected_classroom and selected_classroom.id == c.id %}selected{% endif %}>{{ c.name }} ({{ c.subject }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Report Type -->
+        <div class="col-md-5">
+            <label for="report_type" class="form-label fw-semibold text-muted">Select Report Type</label>
+            <select class="form-select" id="report_type" name="report_type">
+                <option value="summary" {% if report_type == 'summary' %}selected{% endif %}>Classroom Summary Profile</option>
+                <option value="attendance" {% if report_type == 'attendance' %}selected{% endif %}>Attendance Roster Report</option>
+                <option value="bmi" {% if report_type == 'bmi' %}selected{% endif %}>BMI & Growth Monitoring Summary</option>
+                <option value="progress" {% if report_type == 'progress' %}selected{% endif %}>Learning Progress & Scores Report</option>
+            </select>
+        </div>
+        
+        <!-- Action Button -->
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-success text-white w-100 fw-bold"><i class="bi bi-gear-fill me-1"></i> Generate</button>
+        </div>
+    </form>
+</div>
+
+{% if selected_classroom %}
+    <!-- Printable Document Block -->
+    <div class="card p-5 border-0 shadow-sm bg-white">
+        <!-- Document Print Control Area - Hidden on Print -->
+        <div class="text-end mb-4 no-print">
+            <button onclick="window.print()" class="btn btn-outline-success px-4 fw-bold">
+                <i class="bi bi-printer-fill me-2"></i> Print Report / Save PDF
+            </button>
+        </div>
+        
+        <!-- Printable Report Header -->
+        <div class="text-center mb-5 pb-3 border-bottom border-dark border-2">
+            <h3 class="fw-bold mb-1 text-uppercase">Early Childhood Care and Development (ECCD)</h3>
+            <h4 class="fw-bold mb-3 text-uppercase text-muted">Developmental Status Summary Log</h4>
+            <div class="row g-2 justify-content-center text-dark fw-semibold mt-2">
+                <div class="col-sm-4 border-end">Classroom: <span class="text-success">{{ selected_classroom.name }}</span></div>
+                <div class="col-sm-4 border-end">Subject: <span>{{ selected_classroom.subject }}</span></div>
+                <div class="col-sm-4">SY: <span>{{ selected_classroom.school_year }}</span></div>
+            </div>
+            <div class="row g-2 justify-content-center text-dark fw-semibold small mt-1">
+                <div class="col-sm-4 border-end">Report: <span class="text-uppercase text-primary">{{ report_type }}</span></div>
+                <div class="col-sm-4">Date Generated: <span><script>document.write(new Date().toLocaleDateString())</script></span></div>
+            </div>
+        </div>
+
+        {% if learners %}
+            <!-- REPORT RENDERINGS -->
+            
+            <!-- 1. CLASSROOM SUMMARY PROFILE -->
+            {% if report_type == 'summary' %}
+                <h5 class="fw-bold mb-3 text-dark text-uppercase"><i class="bi bi-clipboard2-data me-2"></i>Classroom Summary Profile</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Learner Name</th>
+                                <th>LRN</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>Attendance %</th>
+                                <th>Latest BMI Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in learners %}
+                                <tr>
+                                    <td class="fw-bold">{{ l.full_name }}</td>
+                                    <td><code>{{ l.learner_id or 'N/A' }}</code></td>
+                                    <td>{{ l.gender }}</td>
+                                    <td>{{ l.age or 'N/A' }} yrs</td>
+                                    <td>{{ l.rate }}%</td>
+                                    <td>
+                                        <span class="badge {% if l.bmi_status == 'Normal' %}bg-success{% elif l.bmi_status == 'Underweight' %}bg-warning text-dark{% elif l.bmi_status is none %}bg-secondary{% else %}bg-danger{% endif %} text-white">
+                                            {{ l.bmi_status or 'No Record' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+            <!-- 2. ATTENDANCE ROSTER -->
+            {% elif report_type == 'attendance' %}
+                <h5 class="fw-bold mb-3 text-dark text-uppercase"><i class="bi bi-calendar-check me-2"></i>Attendance Roster Report</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Learner Name</th>
+                                <th>LRN</th>
+                                <th class="text-center">Days Present</th>
+                                <th class="text-center">Days Absent</th>
+                                <th class="text-center">Days Tardy</th>
+                                <th class="text-center">Total School Days</th>
+                                <th class="text-center">Attendance Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in learners %}
+                                <tr>
+                                    <td class="fw-bold">{{ l.full_name }}</td>
+                                    <td><code>{{ l.learner_id or 'N/A' }}</code></td>
+                                    <td class="text-center">{{ l.present }}</td>
+                                    <td class="text-center">{{ l.absent }}</td>
+                                    <td class="text-center">{{ l.tardy }}</td>
+                                    <td class="text-center">{{ l.total }}</td>
+                                    <td class="text-center fw-bold {% if l.rate < 85.0 %}text-danger{% else %}text-success{% endif %}">{{ l.rate }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+            <!-- 3. BMI SUMMARY -->
+            {% elif report_type == 'bmi' %}
+                <h5 class="fw-bold mb-3 text-dark text-uppercase"><i class="bi bi-heart-pulse me-2"></i>BMI & Growth Monitoring Summary</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Learner Name</th>
+                                <th>LRN</th>
+                                <th>Gender</th>
+                                <th class="text-center">Height (cm)</th>
+                                <th class="text-center">Weight (kg)</th>
+                                <th class="text-center">Computed BMI</th>
+                                <th>Nutritional Status</th>
+                                <th>Measurement Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in learners %}
+                                <tr>
+                                    <td class="fw-bold">{{ l.full_name }}</td>
+                                    <td><code>{{ l.learner_id or 'N/A' }}</code></td>
+                                    <td>{{ l.gender }}</td>
+                                    <td class="text-center">{% if l.bmi %}{{ l.bmi.height }} cm{% else %}-{% endif %}</td>
+                                    <td class="text-center">{% if l.bmi %}{{ l.bmi.weight }} kg{% else %}-{% endif %}</td>
+                                    <td class="text-center fw-bold">{% if l.bmi %}{{ l.bmi.bmi }}{% else %}-{% endif %}</td>
+                                    <td>
+                                        {% if l.bmi %}
+                                            <span class="badge {% if l.bmi.status == 'Normal' %}bg-success{% elif l.bmi.status == 'Underweight' %}bg-warning text-dark{% else %}bg-danger{% endif %} text-white">
+                                                {{ l.bmi.status }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted small">No measurements logged</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{% if l.bmi %}{{ l.bmi.recorded_date }}{% else %}-{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+
+                
+            <!-- 5. LEARNING PROGRESS -->
+            {% elif report_type == 'progress' %}
+                <h5 class="fw-bold mb-3 text-dark text-uppercase"><i class="bi bi-award-fill me-2"></i>Learning Progress & Scores Report</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Learner Name</th>
+                                <th>LRN</th>
+                                <th>Individual Assessment Scores</th>
+                                <th class="text-center">Average Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in learners %}
+                                <tr>
+                                    <td class="fw-bold" style="width: 250px;">{{ l.full_name }}</td>
+                                    <td style="width: 120px;"><code>{{ l.learner_id or 'N/A' }}</code></td>
+                                    <td>
+                                        {% if l.assessments %}
+                                            <div class="row g-2">
+                                                {% for ass in l.assessments %}
+                                                    <div class="col-sm-6">
+                                                        <div class="border p-2 bg-light rounded-2 text-dark" style="font-size: 0.8rem;">
+                                                            <strong>{{ ass.title }}</strong> ({{ ass.subject_folder }})
+                                                            <div class="fw-bold text-success mt-1">Score: {{ ass.score or 'Unsubmitted' }}</div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted small">No assessments graded</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center fw-bold fs-5 text-success" style="width: 130px;">
+                                        {% if l.avg_score is not none %}
+                                            {{ l.avg_score }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">No learners enrolled in this classroom to generate reports.</p>
+            </div>
+        {% endif %}
+        
+        <!-- Signatures for official report printing -->
+        <div class="row mt-5 pt-5 justify-content-between text-dark fw-bold">
+            <div class="col-4 text-center">
+                <div class="border-bottom border-dark border-1 mb-2 mx-auto" style="width: 200px;"></div>
+                <small class="text-muted d-block font-normal">Prepared By: ECCD Lead Teacher</small>
+            </div>
+            <div class="col-4 text-center">
+                <div class="border-bottom border-dark border-1 mb-2 mx-auto" style="width: 200px;"></div>
+                <small class="text-muted d-block font-normal">Approved By: Center Administrator</small>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="card p-5 border-0 shadow-sm bg-white text-center">
+        <i class="bi bi-file-earmark-bar-graph text-muted" style="font-size: 4rem;"></i>
+        <p class="text-muted mt-3">Select a classroom above and click <strong>Generate</strong> to render printable logs.</p>
+    </div>
+{% endif %}
+{% endblock %}

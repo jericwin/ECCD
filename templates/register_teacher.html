@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Registration - ECCD System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="card p-4 p-md-5 border-0 shadow">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-workspace text-primary fs-1"></i>
+                <h3 class="fw-bold mt-2">Teacher Registration</h3>
+                <p class="text-muted">Create an administrator/teacher account to manage classrooms</p>
+            </div>
+            
+            <form action="{{ url_for('auth.register_teacher') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold"><i class="bi bi-person-badge"></i> Profile & Identification</h5>
+                
+                <div class="row g-3 mb-4">
+                    <!-- Profile Photo -->
+                    <div class="col-md-6">
+                        <label for="profile_photo" class="form-label fw-semibold">Profile Photo</label>
+                        <input type="file" class="form-control" id="profile_photo" name="profile_photo" accept="image/*">
+                        <small class="text-muted">Upload a professional photo (JPG, PNG, max 5MB)</small>
+                    </div>
+                    <!-- Full Name -->
+                    <div class="col-md-6">
+                        <label for="full_name" class="form-label fw-semibold">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" placeholder="E.g., Maria Santos" value="{{ form_data.full_name or '' }}" required>
+                        <div class="invalid-feedback">Please enter your full name.</div>
+                    </div>
+                    <!-- Employee ID -->
+                    <div class="col-md-6">
+                        <label for="employee_id" class="form-label fw-semibold">Employee ID</label>
+                        <input type="text" class="form-control" id="employee_id" name="employee_id" placeholder="E.g., EMP-12345" value="{{ form_data.employee_id or '' }}" required>
+                        <div class="invalid-feedback">Please enter your Employee ID.</div>
+                    </div>
+                    <!-- Position -->
+                    <div class="col-md-6">
+                        <label for="position" class="form-label fw-semibold">Position</label>
+                        <input type="text" class="form-control" id="position" name="position" placeholder="E.g., Child Development Worker" value="{{ form_data.position or '' }}" required>
+                        <div class="invalid-feedback">Please enter your position.</div>
+                    </div>
+                    <!-- Child Development Center -->
+                    <div class="col-12">
+                        <label for="center_name" class="form-label fw-semibold">Child Development Center</label>
+                        <input type="text" class="form-control" id="center_name" name="center_name" placeholder="E.g., Sunshine Kindergarten Garden" value="{{ form_data.center_name or '' }}" required>
+                        <div class="invalid-feedback">Please enter the center name.</div>
+                    </div>
+                </div>
+                
+                <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold"><i class="bi bi-telephone"></i> Contact Information</h5>
+                <div class="row g-3 mb-4">
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label for="email" class="form-label fw-semibold">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="E.g., maria@example.com" value="{{ form_data.email or '' }}" required>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+                    <!-- Mobile -->
+                    <div class="col-md-6">
+                        <label for="mobile" class="form-label fw-semibold">Mobile Number</label>
+                        <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="E.g., 09123456789" value="{{ form_data.mobile or '' }}" required>
+                        <div class="invalid-feedback">Please enter your mobile number.</div>
+                    </div>
+                    <!-- Address -->
+                    <div class="col-12">
+                        <label for="address" class="form-label fw-semibold">Complete Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="2" placeholder="Street, Barangay, City, Province" required>{{ form_data.address or '' }}</textarea>
+                        <div class="invalid-feedback">Please enter your complete address.</div>
+                    </div>
+                </div>
+                
+                <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold"><i class="bi bi-lock"></i> Account Credentials</h5>
+                <div class="row g-3 mb-4">
+                    <!-- Username -->
+                    <div class="col-12">
+                        <label for="username" class="form-label fw-semibold">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" value="{{ form_data.username or '' }}" required>
+                        <div class="invalid-feedback">Please choose a username.</div>
+                    </div>
+                    <!-- Password -->
+                    <div class="col-md-6">
+                        <label for="password" class="form-label fw-semibold">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
+                        <div class="invalid-feedback">Please enter a password.</div>
+                    </div>
+                    <!-- Confirm Password -->
+                    <div class="col-md-6">
+                        <label for="confirm_password" class="form-label fw-semibold">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Verify password" required>
+                        <div class="invalid-feedback">Please confirm your password.</div>
+                    </div>
+                    <!-- Security Answer -->
+                    <div class="col-12">
+                        <label for="security_answer" class="form-label fw-semibold">Security Question: What was the name of your first school?</label>
+                        <input type="text" class="form-control" id="security_answer" name="security_answer" placeholder="Your answer (used for recovery)" required>
+                        <div class="invalid-feedback">Please enter your security question answer.</div>
+                    </div>
+                </div>
+                
+                <!-- Terms Check -->
+                <div class="mb-4 form-check">
+                    <input type="checkbox" class="form-check-input" id="agree" name="agree" required>
+                    <label class="form-check-label text-muted" for="agree">I agree to the Terms of Service and Privacy Policy</label>
+                    <div class="invalid-feedback">You must agree before registering.</div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between gap-3">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-5 text-white fw-bold">Register Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Client-side Bootstrap validation
+(function () {
+  'use strict'
+  var forms = document.querySelectorAll('.needs-validation')
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}

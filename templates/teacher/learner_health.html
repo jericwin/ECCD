@@ -1,0 +1,127 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="card p-4 border-0 shadow-sm bg-white mb-4">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+        <h4 class="fw-bold text-dark mb-0"><i class="bi bi-heart-pulse-fill text-success me-2"></i>Learner Health Portal</h4>
+        <a href="{{ url_for('teacher.learners') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Learners Directory
+        </a>
+    </div>
+    
+    <!-- Child Summary Header -->
+    <div class="row align-items-center mb-3">
+        <div class="col-md-2 text-center text-md-start mb-3 mb-md-0">
+            {% if learner.photo %}
+                <img src="{{ url_for('static', filename='uploads/learners/' + learner.photo) }}" alt="Child Photo" class="img-thumbnail rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+            {% else %}
+                <i class="bi bi-person-bounding-box text-secondary" style="font-size: 5rem;"></i>
+            {% endif %}
+        </div>
+        <div class="col-md-10">
+            <h5 class="fw-bold mb-1 text-dark">{{ learner.full_name }}</h5>
+            <small class="text-muted d-block mb-1">LRN: <code>{{ learner.learner_id }}</code> | Gender: {{ learner.gender }}</small>
+            <small class="text-muted d-block">Parent: {{ learner.parent_name }} ({{ learner.relationship }})</small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 1. RECORD BMI LOG -->
+    <div class="col-md-6 mb-4">
+        <div class="card p-3 border border-light-subtle h-100 bg-white">
+            <h5 class="fw-bold mb-3 text-success border-bottom pb-2"><i class="bi bi-heart-pulse-fill me-1"></i>Record Growth/BMI</h5>
+            <form action="{{ url_for('teacher.learner_health', learner_id=learner.id) }}" method="POST" class="needs-validation" novalidate>
+                <input type="hidden" name="action" value="bmi">
+                
+                <div class="mb-3">
+                    <label for="height" class="form-label small fw-semibold text-muted">Height (in centimeters)</label>
+                    <div class="input-group input-group-sm">
+                        <input type="number" step="0.1" class="form-control" id="height" name="height" placeholder="E.g., 105.5" required>
+                        <span class="input-group-text">cm</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="weight" class="form-label small fw-semibold text-muted">Weight (in kilograms)</label>
+                    <div class="input-group input-group-sm">
+                        <input type="number" step="0.1" class="form-control" id="weight" name="weight" placeholder="E.g., 16.2" required>
+                        <span class="input-group-text">kg</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="recorded_date" class="form-label small fw-semibold text-muted">Date of Measurement</label>
+                    <input type="date" class="form-control form-control-sm" id="recorded_date" name="recorded_date" required>
+                </div>
+                
+                <button type="submit" class="btn btn-success btn-sm w-100 text-white">Log Growth Record</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 3. BMI HISTORY -->
+    <div class="col-md-6 mb-4">
+        <div class="card p-3 border border-light-subtle bg-white">
+            <h6 class="fw-bold mb-3 text-dark border-bottom pb-2"><i class="bi bi-clock-history text-success me-1"></i>Growth Log History</h6>
+            {% if bmi_records %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Date</th>
+                                <th>Ht / Wt</th>
+                                <th>BMI</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rec in bmi_records %}
+                                <tr>
+                                    <td>{{ rec.recorded_date }}</td>
+                                    <td>{{ rec.height }}cm / {{ rec.weight }}kg</td>
+                                    <td><strong>{{ rec.bmi }}</strong></td>
+                                    <td>
+                                        <span class="badge {% if rec.status == 'Normal' %}bg-success{% elif rec.status == 'Underweight' %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="font-size: 0.7rem;">
+                                            {{ rec.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted small text-center py-3 mb-0">No growth entries logged.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-set date fields to today's date
+document.addEventListener("DOMContentLoaded", function() {
+    var today = new Date().toISOString().split('T')[0];
+    var recordedDate = document.getElementById("recorded_date");
+    if (recordedDate) recordedDate.value = today;
+});
+
+// Bootstrap validation
+(function () {
+  'use strict'
+  var forms = document.querySelectorAll('.needs-validation')
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="row align-items-center mb-4">
+    <div class="col-12">
+        <div class="card bg-success-subtle text-success p-4 border-0 shadow-sm rounded-4">
+            <h3 class="fw-bold mb-1">Hello, Parent {{ parent.parent_name }}!</h3>
+            <p class="mb-0">Welcome to your child's early childhood development monitoring page.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Child Summary card -->
+<div class="card p-4 border-0 shadow-sm bg-white mb-4">
+    <h5 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-person-fill text-success me-2"></i>My Child: {{ learner.full_name }}</h5>
+    <div class="row g-3">
+        <div class="col-md-3 text-center">
+            {% if learner.photo %}
+                <img src="{{ url_for('static', filename='uploads/learners/' + learner.photo) }}" alt="Child Photo" class="img-thumbnail rounded-circle" style="width: 140px; height: 140px; object-fit: cover;">
+            {% else %}
+                <i class="bi bi-person-bounding-box text-secondary" style="font-size: 6rem;"></i>
+            {% endif %}
+            <form action="{{ url_for('parent.upload_child_photo') }}" method="POST" enctype="multipart/form-data" class="mt-2">
+                <label for="dashboard_photo" class="btn btn-sm btn-outline-success w-100 mb-1" style="cursor: pointer;">
+                    <i class="bi bi-camera-fill me-1"></i> {% if learner.photo %}Change{% else %}Upload{% endif %} Photo
+                </label>
+                <input type="file" class="d-none" id="dashboard_photo" name="learner_photo" accept="image/*" onchange="this.form.submit()">
+            </form>
+        </div>
+        <div class="col-md-9">
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <small class="text-muted d-block">Learner Name</small>
+                    <span class="fw-bold text-dark fs-5">{{ learner.full_name }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <small class="text-muted d-block">Learner ID (LRN)</small>
+                    <span class="fw-semibold text-dark"><code>{{ learner.learner_id }}</code></span>
+                </div>
+                <div class="col-sm-6">
+                    <small class="text-muted d-block">Development Center</small>
+                    <span class="fw-semibold text-dark">{{ learner.center_name }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <small class="text-muted d-block">Classroom Enrolled</small>
+                    <span class="fw-semibold text-success">
+                        {% if classroom %}
+                            {{ classroom.name }} ({{ classroom.subject }})
+                        {% else %}
+                            <span class="text-muted">Not enrolled in any class yet</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-top d-flex gap-2">
+                <a href="{{ url_for('parent.child_profile') }}" class="btn btn-success text-white">
+                    <i class="bi bi-balloon me-1"></i> View Full Developmental Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Development Status cards grid -->
+<div class="row g-3">
+    <!-- Stat Card: Attendance -->
+    <div class="col-sm-4">
+        <div class="card p-3 border border-light-subtle h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="fw-bold mb-0 text-muted">Attendance</h6>
+                <i class="bi bi-calendar-check-fill text-primary fs-3"></i>
+            </div>
+            <h4 class="fw-bold">100.0%</h4>
+            <small class="text-muted">Present days</small>
+        </div>
+    </div>
+    
+    <!-- Stat Card: BMI -->
+    <div class="col-sm-4">
+        <div class="card p-3 border border-light-subtle h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="fw-bold mb-0 text-muted">BMI Status</h6>
+                <i class="bi bi-heart-pulse-fill text-danger fs-3"></i>
+            </div>
+            <h4 class="fw-bold">
+                {% if bmi_record %}
+                    {{ bmi_record.status }}
+                {% else %}
+                    <span class="text-muted fs-6">No records</span>
+                {% endif %}
+            </h4>
+            <small class="text-muted">Last record: {% if bmi_record %}{{ bmi_record.recorded_date }}{% else %}N/A{% endif %}</small>
+        </div>
+    </div>
+    
+    <!-- Stat Card: Classrooms -->
+    <div class="col-sm-4">
+        <div class="card p-3 border border-light-subtle h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="fw-bold mb-0 text-muted">Enrolled Classrooms</h6>
+                <i class="bi bi-building text-success fs-3"></i>
+            </div>
+            <h4 class="fw-bold">{{ enrolled_classes_count }}</h4>
+            <small class="text-muted">Active classes</small>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

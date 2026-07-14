@@ -1,0 +1,44 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+*.exe
+*.log
+*.vs/
+.vscode/
+*.DotSettings.user
+/TestResults/
+
+# EF Core
+*.db
+*.db-shm
+*.db-wal
+
+# ASP.NET
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+wwwroot/uploads/
+
+# Node / React
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# IDE
+.idea/
+*.swp
+*.swo
+PRD.md

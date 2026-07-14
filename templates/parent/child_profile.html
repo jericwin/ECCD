@@ -1,0 +1,192 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="card p-4 border-0 shadow-sm bg-white mb-4">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+        <h4 class="fw-bold text-dark mb-0"><i class="bi bi-balloon-fill text-success me-2"></i>Developmental Profile</h4>
+        <button onclick="window.print();" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-printer me-1"></i> Print Profile
+        </button>
+    </div>
+    
+    <!-- Profile Grid Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-3 text-center mb-3 mb-md-0">
+            {% if learner.photo %}
+                <img src="{{ url_for('static', filename='uploads/learners/' + learner.photo) }}" alt="Child Photo" class="img-thumbnail rounded-circle" style="width: 140px; height: 140px; object-fit: cover;">
+            {% else %}
+                <i class="bi bi-person-bounding-box text-secondary" style="font-size: 7rem;"></i>
+            {% endif %}
+            <form action="{{ url_for('parent.upload_child_photo') }}" method="POST" enctype="multipart/form-data" class="mt-2">
+                <label for="profile_photo" class="btn btn-sm btn-outline-success w-100" style="cursor: pointer;">
+                    <i class="bi bi-camera-fill me-1"></i> {% if learner.photo %}Change{% else %}Upload{% endif %} Photo
+                </label>
+                <input type="file" class="d-none" id="profile_photo" name="learner_photo" accept="image/*" onchange="this.form.submit()">
+            </form>
+        </div>
+        <div class="col-md-9">
+            <div class="table-responsive">
+                <table class="table table-sm table-borderless">
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold text-muted" style="width: 150px;">Learner's Name:</td>
+                            <td class="fw-bold">{{ learner.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Learner ID (LRN):</td>
+                            <td><code>{{ learner.learner_id }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Relationship:</td>
+                            <td>{{ learner.relationship }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Center Name:</td>
+                            <td><span class="badge bg-success">{{ learner.center_name }}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Class & Teacher:</td>
+                            <td>
+                                {% if classroom %}
+                                    <strong>{{ classroom.name }}</strong> (Teacher: {{ classroom.teacher_name }})
+                                {% else %}
+                                    <span class="text-muted">Not currently assigned to a class</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs for Child Monitoring Details -->
+<div class="card p-3 border-0 shadow-sm bg-white">
+    <nav>
+        <div class="nav nav-tabs border-bottom mb-3" id="nav-tab" role="tablist">
+            <button class="nav-link active fw-bold text-success" id="nav-bmi-tab" data-bs-toggle="tab" data-bs-target="#nav-bmi" type="button" role="tab" aria-controls="nav-bmi" aria-selected="true">
+                <i class="bi bi-heart-pulse-fill me-1"></i> Growth Monitoring (BMI)
+            </button>
+            <button class="nav-link fw-bold text-muted" id="nav-attendance-tab" data-bs-toggle="tab" data-bs-target="#nav-attendance" type="button" role="tab" aria-controls="nav-attendance" aria-selected="false">
+                <i class="bi bi-calendar-check me-1"></i> Attendance Log
+            </button>
+            <button class="nav-link fw-bold text-muted" id="nav-progress-tab" data-bs-toggle="tab" data-bs-target="#nav-progress" type="button" role="tab" aria-controls="nav-progress" aria-selected="false">
+                <i class="bi bi-journal-check me-1"></i> Learning Progress
+            </button>
+        </div>
+    </nav>
+    
+    <div class="tab-content" id="nav-tabContent">
+        <!-- 1. BMI TAB -->
+        <div class="tab-pane fade show active" id="nav-bmi" role="tabpanel" aria-labelledby="nav-bmi-tab">
+            <h5 class="fw-bold mb-3 text-dark">Weight and Height logs</h5>
+            {% if bmi_records %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Date Recorded</th>
+                                <th>Height (cm)</th>
+                                <th>Weight (kg)</th>
+                                <th>Computed BMI</th>
+                                <th>BMI Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in bmi_records %}
+                                <tr>
+                                    <td>{{ record.recorded_date }}</td>
+                                    <td>{{ record.height }} cm</td>
+                                    <td>{{ record.weight }} kg</td>
+                                    <td><strong>{{ record.bmi }}</strong></td>
+                                    <td>
+                                        <span class="badge {% if record.status == 'Normal' %}bg-success{% elif record.status == 'Underweight' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                            {{ record.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 bg-light rounded">
+                    <i class="bi bi-activity text-muted fs-2"></i>
+                    <p class="text-muted mt-2 mb-0">No BMI growth metrics recorded by the teacher yet.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- 3. ATTENDANCE TAB -->
+        <div class="tab-pane fade" id="nav-attendance" role="tabpanel" aria-labelledby="nav-attendance-tab">
+            <h5 class="fw-bold mb-3 text-dark">Recent Class Attendance</h5>
+            {% if attendance_records %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for att in attendance_records %}
+                                <tr>
+                                    <td>{{ att.date }}</td>
+                                    <td>
+                                        <span class="badge {% if att.status == 'present' %}bg-success{% elif att.status == 'absent' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                            {{ att.status | capitalize }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 bg-light rounded">
+                    <i class="bi bi-calendar-x text-muted fs-2"></i>
+                    <p class="text-muted mt-2 mb-0">No classroom attendance logs present.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- 4. PROGRESS TAB -->
+        <div class="tab-pane fade" id="nav-progress" role="tabpanel" aria-labelledby="nav-progress-tab">
+            <h5 class="fw-bold mb-3 text-dark">Assessments & Teacher Remarks</h5>
+            {% if progress_records %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Date Graded</th>
+                                <th>Task/Worksheet</th>
+                                <th>Folder</th>
+                                <th>Score Obtained</th>
+                                <th>Teacher Observation/Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prog in progress_records %}
+                                <tr>
+                                    <td>{{ prog.graded_at.strftime('%Y-%m-%d') if prog.graded_at else 'N/A' }}</td>
+                                    <td class="fw-semibold">{{ prog.title }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ prog.subject_folder }}</span></td>
+                                    <td><strong>{{ prog.score }}</strong></td>
+                                    <td>{{ prog.remarks or 'No remarks provided.' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 bg-light rounded">
+                    <i class="bi bi-journal-check text-muted fs-2"></i>
+                    <p class="text-muted mt-2 mb-0">No graded worksheets or assessments logs available.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

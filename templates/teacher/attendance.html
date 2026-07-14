@@ -1,0 +1,85 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="card p-4 border-0 shadow-sm bg-white mb-4">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+        <h4 class="fw-bold text-dark mb-0"><i class="bi bi-calendar-check-fill text-success me-2"></i>Record Attendance</h4>
+        <a href="{{ url_for('teacher.classroom_view', classroom_id=classroom.id) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Classroom
+        </a>
+    </div>
+    
+    <!-- Classroom Summary -->
+    <h5 class="fw-bold mb-1">{{ classroom.name }}</h5>
+    <p class="text-muted small mb-4">{{ classroom.subject }} | {{ classroom.school_year }}</p>
+    
+    <!-- Date selector form -->
+    <form method="GET" action="{{ url_for('teacher.record_attendance', classroom_id=classroom.id) }}" class="row g-2 align-items-end mb-4 bg-light p-3 rounded-3">
+        <div class="col-md-4">
+            <label for="attendance_date" class="form-label small fw-semibold text-muted">Attendance Date</label>
+            <input type="date" class="form-control form-control-sm" id="attendance_date" name="date" value="{{ selected_date }}" onchange="this.form.submit()">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-success btn-sm w-100"><i class="bi bi-arrow-clockwise me-1"></i>Load Date</button>
+        </div>
+    </form>
+    
+    <!-- Attendance form -->
+    <form method="POST" action="{{ url_for('teacher.record_attendance', classroom_id=classroom.id) }}">
+        <input type="hidden" name="date" value="{{ selected_date }}">
+        
+        {% if learners %}
+            <div class="table-responsive mb-4">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr class="table-light">
+                            <th>Child Photo</th>
+                            <th>Full Name</th>
+                            <th>LRN</th>
+                            <th class="text-center" style="width: 150px;">Present</th>
+                            <th class="text-center" style="width: 150px;">Absent</th>
+                            <th class="text-center" style="width: 150px;">Tardy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in learners %}
+                            <tr>
+                                <td>
+                                    {% if l.photo %}
+                                        <img src="{{ url_for('static', filename='uploads/learners/' + l.photo) }}" alt="Child Photo" class="img-thumbnail rounded-circle" style="width: 45px; height: 45px; object-fit: cover;">
+                                    {% else %}
+                                        <i class="bi bi-person-bounding-box text-secondary fs-4"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">{{ l.full_name }}</div>
+                                </td>
+                                <td><code>{{ l.learner_id or 'N/A' }}</code></td>
+                                <td class="text-center">
+                                    <input class="form-check-input border-success" type="radio" name="status_{{ l.id }}" id="present_{{ l.id }}" value="present" {% if l.attendance_status == 'present' or not l.attendance_status %}checked{% endif %}>
+                                </td>
+                                <td class="text-center">
+                                    <input class="form-check-input border-danger" type="radio" name="status_{{ l.id }}" id="absent_{{ l.id }}" value="absent" {% if l.attendance_status == 'absent' %}checked{% endif %}>
+                                </td>
+                                <td class="text-center">
+                                    <input class="form-check-input border-warning" type="radio" name="status_{{ l.id }}" id="tardy_{{ l.id }}" value="tardy" {% if l.attendance_status == 'tardy' %}checked{% endif %}>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('teacher.classroom_view', classroom_id=classroom.id) }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-success px-5 text-white fw-bold">Save Attendance Marks</button>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">No learners enrolled in this classroom to record attendance.</p>
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
