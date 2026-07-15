@@ -96,10 +96,116 @@
                 background: none !important;
             }
         }
+        
+        /* Dynamic Theme Overrides */
+        {% if session.get('theme') == 'blue' %}
+        :root {
+            --bs-success-rgb: 13, 110, 253;
+            --bs-success: #0d6efd;
+        }
+        .bg-success { background-color: var(--bs-success) !important; }
+        .text-success { color: var(--bs-success) !important; }
+        .btn-success { background-color: var(--bs-success) !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success { color: var(--bs-success) !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success:hover { background-color: var(--bs-success) !important; color: white !important; }
+        .border-success { border-color: var(--bs-success) !important; }
+        {% elif session.get('theme') == 'purple' %}
+        :root {
+            --bs-success-rgb: 111, 66, 193;
+            --bs-success: #6f42c1;
+        }
+        .bg-success { background-color: var(--bs-success) !important; }
+        .text-success { color: var(--bs-success) !important; }
+        .btn-success { background-color: var(--bs-success) !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success { color: var(--bs-success) !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success:hover { background-color: var(--bs-success) !important; color: white !important; }
+        .border-success { border-color: var(--bs-success) !important; }
+        {% elif session.get('theme') == 'white' %}
+        :root {
+            --bs-success-rgb: 248, 249, 250;
+            --bs-success: #f8f9fa;
+        }
+        .bg-success { background-color: var(--bs-success) !important; color: #212529 !important; border: 1px solid #ced4da !important; }
+        .text-success { color: #495057 !important; }
+        .btn-success { background-color: var(--bs-success) !important; border-color: #ced4da !important; color: #212529 !important; }
+        .btn-success:hover { background-color: #e9ecef !important; }
+        .btn-outline-success { color: #495057 !important; border-color: #ced4da !important; }
+        .btn-outline-success:hover { background-color: var(--bs-success) !important; color: #212529 !important; }
+        .border-success { border-color: #ced4da !important; }
+        {% elif session.get('theme') == 'red' %}
+        :root {
+            --bs-success-rgb: 220, 53, 69;
+            --bs-success: #dc3545;
+        }
+        .bg-success { background-color: var(--bs-success) !important; color: white !important; }
+        .text-success { color: var(--bs-success) !important; }
+        .btn-success { background-color: var(--bs-success) !important; border-color: var(--bs-success) !important; color: white !important; }
+        .btn-outline-success { color: var(--bs-success) !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success:hover { background-color: var(--bs-success) !important; color: white !important; }
+        .border-success { border-color: var(--bs-success) !important; }
+        {% elif session.get('theme') == 'yellow' %}
+        :root {
+            --bs-success-rgb: 255, 193, 7;
+            --bs-success: #ffc107;
+        }
+        .bg-success { background-color: var(--bs-success) !important; color: #212529 !important; }
+        .text-success { color: #d39e00 !important; }
+        .btn-success { background-color: var(--bs-success) !important; border-color: var(--bs-success) !important; color: #212529 !important; }
+        .btn-outline-success { color: #d39e00 !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success:hover { background-color: var(--bs-success) !important; color: #212529 !important; }
+        .border-success { border-color: var(--bs-success) !important; }
+        {% elif session.get('theme') == 'dark' %}
+        body { background-color: #121212 !important; color: #f8f9fa !important; }
+        .bg-white { background-color: #1e1e1e !important; color: #f8f9fa !important; }
+        .bg-light { background-color: #2a2a2a !important; color: #f8f9fa !important; }
+        .text-dark { color: #f8f9fa !important; }
+        .text-muted { color: #adb5bd !important; }
+        .card { background-color: #1e1e1e !important; border-color: #333 !important; }
+        .navbar { background-color: #1e1e1e !important; border-bottom-color: #333 !important; }
+        .table-light { background-color: #2a2a2a !important; color: #f8f9fa !important; }
+        .table { color: #f8f9fa !important; }
+        .border-bottom { border-bottom-color: #333 !important; }
+        .border-light { border-color: #333 !important; }
+        .nav-link.text-dark { color: #f8f9fa !important; }
+        .nav-link.text-dark:hover { background-color: #2c2c2c !important; }
+        .modal-content { background-color: #1e1e1e !important; color: #f8f9fa !important; }
+        /* Keep green accent for dark mode, but slightly brighter */
+        :root {
+            --bs-success-rgb: 32, 201, 151;
+            --bs-success: #20c997;
+        }
+        .bg-success { background-color: var(--bs-success) !important; color: #000 !important; }
+        .text-success { color: var(--bs-success) !important; }
+        .btn-success { background-color: var(--bs-success) !important; border-color: var(--bs-success) !important; color: #000 !important; }
+        .btn-outline-success { color: var(--bs-success) !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success:hover { background-color: var(--bs-success) !important; color: #000 !important; }
+        .border-success { border-color: var(--bs-success) !important; }
+        {% elif session.get('theme') == 'rainbow' %}
+        @keyframes rainbowHue {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        :root {
+            --bs-success-rgb: 255, 59, 59;
+            --bs-success: #ff3b3b;
+        }
+        /* Override Bootstrap's success colors to be our base red */
+        .bg-success { background-color: var(--bs-success) !important; color: white !important; }
+        .text-success { color: var(--bs-success) !important; }
+        .btn-success { background-color: var(--bs-success) !important; border-color: var(--bs-success) !important; color: white !important; }
+        .btn-outline-success { color: var(--bs-success) !important; border-color: var(--bs-success) !important; }
+        .btn-outline-success:hover { background-color: var(--bs-success) !important; color: white !important; }
+        .border-success { border-color: var(--bs-success) !important; }
+        
+        /* Apply hue rotation animation */
+        .bg-success, .text-success, .btn-success, .btn-outline-success, .border-success, .selected-theme, .check-badge, .nav-link.active {
+            animation: rainbowHue 5s linear infinite !important;
+        }
+        {% endif %}
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body {% if session.get('theme') == 'dark' %}data-bs-theme="dark"{% endif %}>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-3">
         <div class="container">

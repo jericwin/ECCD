@@ -1,0 +1,206 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<div class="card p-4 border-0 shadow-sm bg-white mb-4">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+        <h4 class="fw-bold text-dark mb-0"><i class="bi bi-palette-fill text-success me-2"></i>Theme Settings</h4>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-10">
+            <p class="text-muted mb-4">Customize the appearance of your ECCD portal. Select a color theme below and save your changes.</p>
+            
+            <style>
+                .theme-option {
+                    transition: all 0.3s ease;
+                    border-width: 3px !important;
+                    position: relative;
+                }
+                .theme-option:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+                    border-color: #6c757d !important;
+                    cursor: pointer;
+                }
+                
+                .theme-option.selected-theme {
+                    border-color: var(--bs-success) !important;
+                    background-color: rgba(var(--bs-success-rgb), 0.05);
+                    transform: scale(1.02);
+                }
+                
+                .theme-option.selected-theme:hover {
+                    border-color: var(--bs-success) !important;
+                }
+                
+                .check-badge {
+                    position: absolute;
+                    top: -10px;
+                    right: -10px;
+                    background-color: var(--bs-success);
+                    color: white;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 16px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    opacity: 0;
+                    transform: scale(0);
+                    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                }
+                
+                .theme-option.selected-theme .check-badge {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            </style>
+            
+            <form action="{{ url_for('teacher.settings') }}" method="POST">
+                <div class="mb-4">
+                    <label class="form-label fw-bold d-block mb-3">Website Color Theme</label>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="green" class="d-none" onchange="updatePreview('green')" {% if current_theme == 'green' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option {% if current_theme == 'green' %}selected-theme{% endif %}" id="option-green">
+                                    <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 50px; height: 50px; background-color: #198754;"></div>
+                                        <h6 class="mb-0 fw-bold">Mint Green</h6>
+                                        <small class="text-muted">(Default)</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="blue" class="d-none" onchange="updatePreview('blue')" {% if current_theme == 'blue' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option {% if current_theme == 'blue' %}selected-theme{% endif %}" id="option-blue">
+                                    <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 50px; height: 50px; background-color: #0d6efd;"></div>
+                                        <h6 class="mb-0 fw-bold">Ocean Blue</h6>
+                                        <small class="text-muted">Calm</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="purple" class="d-none" onchange="updatePreview('purple')" {% if current_theme == 'purple' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option {% if current_theme == 'purple' %}selected-theme{% endif %}" id="option-purple">
+                                    <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 50px; height: 50px; background-color: #6f42c1;"></div>
+                                        <h6 class="mb-0 fw-bold">Royal Purple</h6>
+                                        <small class="text-muted">Elegant</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="white" class="d-none" onchange="updatePreview('white')" {% if current_theme == 'white' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option {% if current_theme == 'white' %}selected-theme{% endif %}" id="option-white">
+                                    <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 shadow-sm border border-secondary" style="width: 50px; height: 50px; background-color: #f8f9fa;"></div>
+                                        <h6 class="mb-0 fw-bold">Clean White</h6>
+                                        <small class="text-muted">Minimal</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="red" class="d-none" onchange="updatePreview('red')" {% if current_theme == 'red' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option {% if current_theme == 'red' %}selected-theme{% endif %}" id="option-red">
+                                    <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 50px; height: 50px; background-color: #dc3545;"></div>
+                                        <h6 class="mb-0 fw-bold">Ruby Red</h6>
+                                        <small class="text-muted">Bold</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="yellow" class="d-none" onchange="updatePreview('yellow')" {% if current_theme == 'yellow' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option {% if current_theme == 'yellow' %}selected-theme{% endif %}" id="option-yellow">
+                                    <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 50px; height: 50px; background-color: #ffc107;"></div>
+                                        <h6 class="mb-0 fw-bold">Sunny Yellow</h6>
+                                        <small class="text-muted">Bright</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="dark" class="d-none" onchange="updatePreview('dark')" {% if current_theme == 'dark' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option bg-dark text-white {% if current_theme == 'dark' %}selected-theme{% endif %}" id="option-dark">
+                                    <div class="check-badge"><i class="bi bi-check-lg text-dark"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 border border-secondary shadow-sm" style="width: 50px; height: 50px; background-color: #212529;"></div>
+                                        <h6 class="mb-0 fw-bold">Dark Mode</h6>
+                                        <small class="text-light opacity-75">Sleek</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="w-100 m-0">
+                                <input type="radio" name="theme" value="rainbow" class="d-none" onchange="updatePreview('rainbow')" {% if current_theme == 'rainbow' %}checked{% endif %}>
+                                <div class="card border-light shadow-sm theme-option {% if current_theme == 'rainbow' %}selected-theme{% endif %}" id="option-rainbow">
+                                    <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                                    <div class="card-body text-center p-3">
+                                        <div class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 50px; height: 50px; background: linear-gradient(45deg, #ff3b3b, #ff9800, #ffeb3b, #4caf50, #2196f3, #9c27b0);"></div>
+                                        <h6 class="mb-0 fw-bold">Rainbow</h6>
+                                        <small class="text-muted">Dynamic</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success px-4 py-2 rounded-pill shadow-sm">
+                        <i class="bi bi-save me-1"></i> Save Theme Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePreview(selectedTheme) {
+        // Remove highlight from all options
+        document.querySelectorAll('.theme-option').forEach(el => {
+            el.classList.remove('selected-theme');
+        });
+        
+        // Add highlight to selected option
+        const selectedEl = document.getElementById('option-' + selectedTheme);
+        if(selectedEl) {
+            selectedEl.classList.add('selected-theme');
+        }
+    }
+</script>
+{% endblock %}

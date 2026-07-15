@@ -38,6 +38,9 @@
                     <a href="{{ url_for('teacher.announcements') }}" class="nav-link {% if active_page == 'announcements' %}active bg-success text-white{% else %}text-dark{% endif %} py-2 px-3 my-1 rounded-3">
                         <i class="bi bi-megaphone me-2"></i> Announcements
                     </a>
+                    <a href="{{ url_for('teacher.settings') }}" class="nav-link {% if active_page == 'settings' %}active bg-success text-white{% else %}text-dark{% endif %} py-2 px-3 my-1 rounded-3">
+                        <i class="bi bi-palette me-2"></i> Theme Settings
+                    </a>
                 {% elif session.get('role') == 'parent' %}
                     <!-- Parent Links -->
                     <a href="{{ url_for('parent.dashboard') }}" class="nav-link {% if active_page == 'dashboard' %}active bg-success text-white{% else %}text-dark{% endif %} py-2 px-3 my-1 rounded-3">
@@ -57,6 +60,9 @@
                     </a>
                     <a href="{{ url_for('parent.enroll') }}" class="nav-link {% if active_page == 'enroll' %}active bg-success text-white{% else %}text-dark{% endif %} py-2 px-3 my-1 rounded-3">
                         <i class="bi bi-search me-2"></i> Find Classroom
+                    </a>
+                    <a href="{{ url_for('parent.settings') }}" class="nav-link {% if active_page == 'settings' %}active bg-success text-white{% else %}text-dark{% endif %} py-2 px-3 my-1 rounded-3">
+                        <i class="bi bi-palette me-2"></i> Theme Settings
                     </a>
                 {% endif %}
             </div>

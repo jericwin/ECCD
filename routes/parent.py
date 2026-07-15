@@ -141,6 +141,30 @@ def dashboard():
         bmi_record=bmi_record
     )
 
+@parent_bp.route('/parent/settings', methods=['GET', 'POST'])
+def settings():
+    if 'user_id' not in session or session.get('role') != 'parent':
+        return redirect(url_for('auth.login'))
+        
+    parent, learner = get_parent_and_child(session['user_id'])
+    if not parent:
+        return redirect(url_for('main.landing'))
+        
+    if request.method == 'POST':
+        theme = request.form.get('theme')
+        if theme in ['green', 'blue', 'purple', 'white', 'red', 'yellow', 'dark', 'rainbow']:
+            execute_query("UPDATE parents SET theme = %s WHERE id = %s", (theme, parent['id']), commit=True)
+            session['theme'] = theme
+            flash('Website theme updated successfully!', 'success')
+            return redirect(url_for('parent.settings'))
+            
+    current_theme = session.get('theme', 'green')
+    return render_template(
+        'parent/settings.html',
+        active_page='settings',
+        current_theme=current_theme
+    )
+
 @parent_bp.route('/parent/child')
 def child_profile():
     if 'user_id' not in session or session.get('role') != 'parent':

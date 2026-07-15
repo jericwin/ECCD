@@ -82,6 +82,9 @@
         <div class="tab-pane fade show active" id="nav-bmi" role="tabpanel" aria-labelledby="nav-bmi-tab">
             <h5 class="fw-bold mb-3 text-dark">Weight and Height logs</h5>
             {% if bmi_records %}
+                <div class="mb-4" style="height: 300px;">
+                    <canvas id="bmiChart"></canvas>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
@@ -122,6 +125,11 @@
         <div class="tab-pane fade" id="nav-attendance" role="tabpanel" aria-labelledby="nav-attendance-tab">
             <h5 class="fw-bold mb-3 text-dark">Recent Class Attendance</h5>
             {% if attendance_records %}
+                <div class="row mb-4">
+                    <div class="col-md-6 offset-md-3" style="height: 300px;">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
@@ -156,6 +164,9 @@
         <div class="tab-pane fade" id="nav-progress" role="tabpanel" aria-labelledby="nav-progress-tab">
             <h5 class="fw-bold mb-3 text-dark">Assessments & Teacher Remarks</h5>
             {% if progress_records %}
+                <div class="mb-4" style="height: 300px;">
+                    <canvas id="progressChart"></canvas>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
@@ -189,4 +200,101 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // BMI Chart
+        {% if bmi_records %}
+        const bmiData = [
+            {% for r in bmi_records | reverse %}
+            { date: '{{ r.recorded_date }}', bmi: {{ r.bmi }} },
+            {% endfor %}
+        ];
+        
+        const bmiCtx = document.getElementById('bmiChart').getContext('2d');
+        new Chart(bmiCtx, {
+            type: 'line',
+            data: {
+                labels: bmiData.map(d => d.date),
+                datasets: [{
+                    label: 'BMI Trend',
+                    data: bmiData.map(d => d.bmi),
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+        {% endif %}
+
+        // Attendance Chart
+        {% if attendance_records %}
+        const attRecords = [
+            {% for att in attendance_records %}
+            '{{ att.status }}',
+            {% endfor %}
+        ];
+        let present = 0, absent = 0, tardy = 0;
+        attRecords.forEach(status => {
+            if (status === 'present') present++;
+            else if (status === 'absent') absent++;
+            else tardy++;
+        });
+
+        const attCtx = document.getElementById('attendanceChart').getContext('2d');
+        new Chart(attCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Present', 'Absent', 'Tardy'],
+                datasets: [{
+                    data: [present, absent, tardy],
+                    backgroundColor: ['#198754', '#dc3545', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        {% endif %}
+
+        // Progress Chart
+        {% if progress_records %}
+        const progressData = [
+            {% for p in progress_records | reverse %}
+            { task: '{{ p.title }}', score: {{ p.score if p.score else 0 }} },
+            {% endfor %}
+        ];
+
+        const progCtx = document.getElementById('progressChart').getContext('2d');
+        new Chart(progCtx, {
+            type: 'bar',
+            data: {
+                labels: progressData.map(d => d.task),
+                datasets: [{
+                    label: 'Assessment Scores',
+                    data: progressData.map(d => d.score),
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
 {% endblock %}

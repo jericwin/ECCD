@@ -37,12 +37,14 @@ def login():
             
             # Cache profile data in session to avoid redundant DB queries on every navigation
             if role == 'teacher':
-                teacher = execute_query("SELECT id, full_name, center_name, position, profile_photo FROM teachers WHERE user_id = %s", (user['id'],), fetch_one=True)
+                teacher = execute_query("SELECT id, full_name, center_name, position, profile_photo, theme FROM teachers WHERE user_id = %s", (user['id'],), fetch_one=True)
                 if teacher:
+                    session['theme'] = teacher.get('theme', 'green')
                     session['profile'] = teacher
             elif role == 'parent':
-                parent = execute_query("SELECT id, parent_name, mobile, address FROM parents WHERE user_id = %s", (user['id'],), fetch_one=True)
+                parent = execute_query("SELECT id, parent_name, mobile, address, theme FROM parents WHERE user_id = %s", (user['id'],), fetch_one=True)
                 if parent:
+                    session['theme'] = parent.get('theme', 'green')
                     # Convert dates in learner record to string so it can be JSON serialized in Flask session cookie
                     learner = execute_query("SELECT id, learner_id, full_name, center_name, photo, gender, birthdate FROM learners WHERE parent_id = %s", (parent['id'],), fetch_one=True)
                     if learner:

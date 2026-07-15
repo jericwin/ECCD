@@ -451,22 +451,46 @@ def enrollment_requests():
     if not teacher:
         return redirect(url_for('main.landing'))
         
-    requests = execute_query(
-        """SELECT er.*, l.full_name as learner_name, p.parent_name, c.name as classroom_name 
-           FROM enrollment_requests er
-           JOIN learners l ON er.learner_id = l.id
-           JOIN parents p ON l.parent_id = p.id
-           JOIN classrooms c ON er.classroom_id = c.id
-           WHERE c.teacher_id = %s AND er.status = 'pending'
-           ORDER BY er.created_at DESC""",
+    classroom_filter = request.args.get('classroom_id', '')
+    
+    # Get all classrooms for this teacher for the filter dropdown
+    classrooms = execute_query(
+        "SELECT id, name FROM classrooms WHERE teacher_id = %s ORDER BY name ASC",
         (teacher['id'],),
         fetch_all=True
     ) or []
+        
+    if classroom_filter:
+        requests_list = execute_query(
+            """SELECT er.*, l.full_name as learner_name, p.parent_name, c.name as classroom_name 
+               FROM enrollment_requests er
+               JOIN learners l ON er.learner_id = l.id
+               JOIN parents p ON l.parent_id = p.id
+               JOIN classrooms c ON er.classroom_id = c.id
+               WHERE c.teacher_id = %s AND er.status = 'pending' AND c.id = %s
+               ORDER BY er.created_at DESC""",
+            (teacher['id'], classroom_filter),
+            fetch_all=True
+        ) or []
+    else:
+        requests_list = execute_query(
+            """SELECT er.*, l.full_name as learner_name, p.parent_name, c.name as classroom_name 
+               FROM enrollment_requests er
+               JOIN learners l ON er.learner_id = l.id
+               JOIN parents p ON l.parent_id = p.id
+               JOIN classrooms c ON er.classroom_id = c.id
+               WHERE c.teacher_id = %s AND er.status = 'pending'
+               ORDER BY er.created_at DESC""",
+            (teacher['id'],),
+            fetch_all=True
+        ) or []
     
     return render_template(
         'teacher/enrollment_requests.html',
         active_page='enrollment_requests',
-        requests=requests
+        requests=requests_list,
+        classrooms=classrooms,
+        classroom_filter=classroom_filter
     )
 
 @teacher_bp.route('/teacher/enrollment_requests/<int:request_id>', methods=['POST'])
@@ -1309,4 +1333,29 @@ def classwork_submissions(classwork_id):
         active_page='classrooms',
         classwork=cw,
         students=students
+    )
+
+@teacher_bp.route('/teacher/settings', methods=['GET', 'POST'])
+def settings():
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('auth.login'))
+        
+    teacher = get_teacher_profile(session['user_id'])
+    if not teacher:
+        return redirect(url_for('main.landing'))
+    teacher_id = teacher['id']
+        
+    if request.method == 'POST':
+        theme = request.form.get('theme')
+        if theme in ['green', 'blue', 'purple', 'white', 'red', 'yellow', 'dark', 'rainbow']:
+            execute_query("UPDATE teachers SET theme = %s WHERE id = %s", (theme, teacher_id), commit=True)
+            session['theme'] = theme
+            flash('Website theme updated successfully!', 'success')
+            return redirect(url_for('teacher.settings'))
+            
+    current_theme = session.get('theme', 'green')
+    return render_template(
+        'teacher/settings.html',
+        active_page='settings',
+        current_theme=current_theme
     )
