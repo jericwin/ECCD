@@ -6246,3 +6246,357 @@ Params: (2, '2026-07-16', 2)
 2026-07-15 13:39:56,547 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
 2026-07-15 13:39:56,569 INFO: DB_SQL_SUCCESS: Query completed in 0.0218s
 2026-07-15 13:39:56,572 INFO: HTTP_RESPONSE: GET /parent/child -> Status 200 OK
+2026-07-15 13:43:23,343 INFO: HTTP_REQUEST: GET /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:43:23,343 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:43:23,347 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-15 13:43:23,348 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:43:23,375 INFO: DB_SQL_SUCCESS: Query completed in 0.0270s
+2026-07-15 13:43:23,375 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:43:23,379 INFO: DB_SQL_SUCCESS: Query completed in 0.0037s
+2026-07-15 13:43:23,379 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:43:23,392 INFO: DB_SQL_SUCCESS: Query completed in 0.0129s
+2026-07-15 13:43:23,393 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:43:23,409 INFO: DB_SQL_SUCCESS: Query completed in 0.0164s
+2026-07-15 13:43:23,410 INFO: HTTP_RESPONSE: GET /parent/settings -> Status 200 OK
+2026-07-15 13:44:10,362 INFO: HTTP_REQUEST: POST /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:10,362 INFO: DB_SQL: executing: UPDATE parents SET theme = %s WHERE id = %s with params: ('rainbow', 2)
+2026-07-15 13:44:10,368 INFO: DB_SQL_SUCCESS: Query completed in 0.0058s
+2026-07-15 13:44:10,369 INFO: HTTP_RESPONSE: POST /parent/settings -> Status 302 FOUND
+2026-07-15 13:44:10,382 INFO: HTTP_REQUEST: GET /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:10,383 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:10,396 INFO: DB_SQL_SUCCESS: Query completed in 0.0131s
+2026-07-15 13:44:10,396 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:10,412 INFO: DB_SQL_SUCCESS: Query completed in 0.0156s
+2026-07-15 13:44:10,412 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:10,416 INFO: DB_SQL_SUCCESS: Query completed in 0.0040s
+2026-07-15 13:44:10,417 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:10,431 INFO: DB_SQL_SUCCESS: Query completed in 0.0140s
+2026-07-15 13:44:10,431 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:10,446 INFO: DB_SQL_SUCCESS: Query completed in 0.0150s
+2026-07-15 13:44:10,448 INFO: HTTP_RESPONSE: GET /parent/settings -> Status 200 OK
+2026-07-15 13:44:17,800 INFO: HTTP_REQUEST: GET /parent/child | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:17,800 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-15 13:44:17,815 INFO: DB_SQL_SUCCESS: Query completed in 0.0149s
+2026-07-15 13:44:17,816 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC with params: (2,)
+2026-07-15 13:44:17,820 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-15 13:44:17,820 INFO: DB_SQL: executing: SELECT * FROM attendance WHERE learner_id = %s ORDER BY date DESC LIMIT 15 with params: (2,)
+2026-07-15 13:44:17,824 INFO: DB_SQL_SUCCESS: Query completed in 0.0037s
+2026-07-15 13:44:17,824 INFO: DB_SQL: executing: SELECT a.*, cw.title, cw.subject_folder FROM assessments a            JOIN classwork cw ON a.classwork_id = cw.id            WHERE a.learner_id = %s            ORDER BY a.graded_at DESC with params: (2,)
+2026-07-15 13:44:17,828 INFO: DB_SQL_SUCCESS: Query completed in 0.0034s
+2026-07-15 13:44:17,828 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:17,849 INFO: DB_SQL_SUCCESS: Query completed in 0.0200s
+2026-07-15 13:44:17,849 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:17,865 INFO: DB_SQL_SUCCESS: Query completed in 0.0161s
+2026-07-15 13:44:17,865 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:17,883 INFO: DB_SQL_SUCCESS: Query completed in 0.0172s
+2026-07-15 13:44:17,883 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:17,899 INFO: DB_SQL_SUCCESS: Query completed in 0.0160s
+2026-07-15 13:44:17,899 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:17,916 INFO: DB_SQL_SUCCESS: Query completed in 0.0162s
+2026-07-15 13:44:17,917 INFO: HTTP_RESPONSE: GET /parent/child -> Status 200 OK
+2026-07-15 13:44:21,596 INFO: HTTP_REQUEST: GET /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:21,597 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:21,616 INFO: DB_SQL_SUCCESS: Query completed in 0.0189s
+2026-07-15 13:44:21,616 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:21,619 INFO: DB_SQL_SUCCESS: Query completed in 0.0033s
+2026-07-15 13:44:21,620 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:21,623 INFO: DB_SQL_SUCCESS: Query completed in 0.0034s
+2026-07-15 13:44:21,624 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:21,627 INFO: DB_SQL_SUCCESS: Query completed in 0.0033s
+2026-07-15 13:44:21,627 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:21,631 INFO: DB_SQL_SUCCESS: Query completed in 0.0038s
+2026-07-15 13:44:21,633 INFO: HTTP_RESPONSE: GET /parent/settings -> Status 200 OK
+2026-07-15 13:44:25,285 INFO: HTTP_REQUEST: POST /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:25,286 INFO: DB_SQL: executing: UPDATE parents SET theme = %s WHERE id = %s with params: ('white', 2)
+2026-07-15 13:44:25,291 INFO: DB_SQL_SUCCESS: Query completed in 0.0056s
+2026-07-15 13:44:25,292 INFO: HTTP_RESPONSE: POST /parent/settings -> Status 302 FOUND
+2026-07-15 13:44:25,304 INFO: HTTP_REQUEST: GET /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:25,304 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:25,319 INFO: DB_SQL_SUCCESS: Query completed in 0.0150s
+2026-07-15 13:44:25,320 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:25,331 INFO: DB_SQL_SUCCESS: Query completed in 0.0118s
+2026-07-15 13:44:25,332 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:25,351 INFO: DB_SQL_SUCCESS: Query completed in 0.0189s
+2026-07-15 13:44:25,351 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:25,366 INFO: DB_SQL_SUCCESS: Query completed in 0.0149s
+2026-07-15 13:44:25,367 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:25,384 INFO: DB_SQL_SUCCESS: Query completed in 0.0173s
+2026-07-15 13:44:25,385 INFO: HTTP_RESPONSE: GET /parent/settings -> Status 200 OK
+2026-07-15 13:44:28,477 INFO: HTTP_REQUEST: GET /parent/dashboard | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:28,477 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-15 13:44:28,481 INFO: DB_SQL_SUCCESS: Query completed in 0.0039s
+2026-07-15 13:44:28,481 INFO: DB_SQL: executing: SELECT COUNT(*) as count FROM classroom_learners WHERE learner_id = %s with params: (2,)
+2026-07-15 13:44:28,498 INFO: DB_SQL_SUCCESS: Query completed in 0.0169s
+2026-07-15 13:44:28,499 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC LIMIT 1 with params: (2,)
+2026-07-15 13:44:28,502 INFO: DB_SQL_SUCCESS: Query completed in 0.0033s
+2026-07-15 13:44:28,503 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:28,506 INFO: DB_SQL_SUCCESS: Query completed in 0.0031s
+2026-07-15 13:44:28,506 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:28,530 INFO: DB_SQL_SUCCESS: Query completed in 0.0240s
+2026-07-15 13:44:28,531 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:28,534 INFO: DB_SQL_SUCCESS: Query completed in 0.0034s
+2026-07-15 13:44:28,534 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:28,546 INFO: DB_SQL_SUCCESS: Query completed in 0.0119s
+2026-07-15 13:44:28,547 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:28,565 INFO: DB_SQL_SUCCESS: Query completed in 0.0184s
+2026-07-15 13:44:28,567 INFO: HTTP_RESPONSE: GET /parent/dashboard -> Status 200 OK
+2026-07-15 13:44:30,948 INFO: HTTP_REQUEST: GET /parent/child | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:30,949 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-15 13:44:30,953 INFO: DB_SQL_SUCCESS: Query completed in 0.0039s
+2026-07-15 13:44:30,953 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC with params: (2,)
+2026-07-15 13:44:30,957 INFO: DB_SQL_SUCCESS: Query completed in 0.0043s
+2026-07-15 13:44:30,958 INFO: DB_SQL: executing: SELECT * FROM attendance WHERE learner_id = %s ORDER BY date DESC LIMIT 15 with params: (2,)
+2026-07-15 13:44:30,962 INFO: DB_SQL_SUCCESS: Query completed in 0.0046s
+2026-07-15 13:44:30,963 INFO: DB_SQL: executing: SELECT a.*, cw.title, cw.subject_folder FROM assessments a            JOIN classwork cw ON a.classwork_id = cw.id            WHERE a.learner_id = %s            ORDER BY a.graded_at DESC with params: (2,)
+2026-07-15 13:44:30,967 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-15 13:44:30,968 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:30,971 INFO: DB_SQL_SUCCESS: Query completed in 0.0034s
+2026-07-15 13:44:30,971 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:30,975 INFO: DB_SQL_SUCCESS: Query completed in 0.0033s
+2026-07-15 13:44:30,975 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:30,979 INFO: DB_SQL_SUCCESS: Query completed in 0.0035s
+2026-07-15 13:44:30,979 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:30,982 INFO: DB_SQL_SUCCESS: Query completed in 0.0034s
+2026-07-15 13:44:30,983 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:30,987 INFO: DB_SQL_SUCCESS: Query completed in 0.0036s
+2026-07-15 13:44:30,988 INFO: HTTP_RESPONSE: GET /parent/child -> Status 200 OK
+2026-07-15 13:44:34,534 INFO: HTTP_REQUEST: GET /parent/announcements | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:34,535 INFO: DB_SQL: executing: SELECT c.teacher_id FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            WHERE cl.learner_id = %s LIMIT 1 with params: (2,)
+2026-07-15 13:44:34,560 INFO: DB_SQL_SUCCESS: Query completed in 0.0249s
+2026-07-15 13:44:34,560 INFO: DB_SQL: executing: SELECT a.*, t.full_name as teacher_name, t.center_name                FROM announcements a                JOIN teachers t ON a.teacher_id = t.id                WHERE a.teacher_id IN (                    SELECT c.teacher_id FROM classrooms c                    JOIN classroom_learners cl ON cl.classroom_id = c.id                    WHERE cl.learner_id = %s                )                OR t.center_name = %s                ORDER BY a.created_at DESC with params: (2, 'Kinder')
+2026-07-15 13:44:34,566 INFO: DB_SQL_SUCCESS: Query completed in 0.0058s
+2026-07-15 13:44:34,567 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:34,591 INFO: DB_SQL_SUCCESS: Query completed in 0.0240s
+2026-07-15 13:44:34,591 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:34,609 INFO: DB_SQL_SUCCESS: Query completed in 0.0180s
+2026-07-15 13:44:34,610 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:34,626 INFO: DB_SQL_SUCCESS: Query completed in 0.0163s
+2026-07-15 13:44:34,626 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:34,642 INFO: DB_SQL_SUCCESS: Query completed in 0.0155s
+2026-07-15 13:44:34,642 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:34,660 INFO: DB_SQL_SUCCESS: Query completed in 0.0181s
+2026-07-15 13:44:34,663 INFO: HTTP_RESPONSE: GET /parent/announcements -> Status 200 OK
+2026-07-15 13:44:37,059 INFO: HTTP_REQUEST: GET /parent/enroll | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:37,060 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name, t.center_name,                (SELECT COUNT(*) FROM classroom_learners cl WHERE cl.classroom_id = c.id) as learners_count,                (SELECT status FROM enrollment_requests er WHERE er.classroom_id = c.id AND er.learner_id = %s ORDER BY created_at DESC LIMIT 1) as request_status,                (SELECT id FROM classroom_learners cl2 WHERE cl2.classroom_id = c.id AND cl2.learner_id = %s) as is_enrolled                FROM classrooms c                JOIN teachers t ON c.teacher_id = t.id                WHERE c.status = 'active'                ORDER BY c.created_at DESC with params: (2, 2)
+2026-07-15 13:44:37,064 INFO: DB_SQL_SUCCESS: Query completed in 0.0044s
+2026-07-15 13:44:37,065 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:37,068 INFO: DB_SQL_SUCCESS: Query completed in 0.0035s
+2026-07-15 13:44:37,069 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:37,093 INFO: DB_SQL_SUCCESS: Query completed in 0.0239s
+2026-07-15 13:44:37,093 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:37,096 INFO: DB_SQL_SUCCESS: Query completed in 0.0033s
+2026-07-15 13:44:37,097 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:37,100 INFO: DB_SQL_SUCCESS: Query completed in 0.0033s
+2026-07-15 13:44:37,101 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:37,128 INFO: DB_SQL_SUCCESS: Query completed in 0.0277s
+2026-07-15 13:44:37,130 INFO: HTTP_RESPONSE: GET /parent/enroll -> Status 200 OK
+2026-07-15 13:44:39,113 INFO: HTTP_REQUEST: GET /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-15 13:44:39,114 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:44:39,118 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-15 13:44:39,119 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:44:39,122 INFO: DB_SQL_SUCCESS: Query completed in 0.0037s
+2026-07-15 13:44:39,123 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:44:39,127 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-15 13:44:39,127 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:44:39,132 INFO: DB_SQL_SUCCESS: Query completed in 0.0043s
+2026-07-15 13:44:39,132 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:44:39,136 INFO: DB_SQL_SUCCESS: Query completed in 0.0038s
+2026-07-15 13:44:39,137 INFO: HTTP_RESPONSE: GET /parent/settings -> Status 200 OK
+2026-07-15 13:47:27,774 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.127.0 Chrome/148.0.7778.97 Electron/42.2.0 Safari/537.36
+2026-07-15 13:47:27,787 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-15 13:50:13,857 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.127.0 Chrome/148.0.7778.97 Electron/42.2.0 Safari/537.36
+2026-07-15 13:50:13,858 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-15 13:52:29,566 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:29,701 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-15 13:52:30,189 INFO: HTTP_REQUEST: GET /favicon.ico | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:30,190 INFO: HTTP_RESPONSE: GET /favicon.ico -> Status 404 NOT FOUND
+2026-07-15 13:52:31,831 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:31,842 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-15 13:52:38,823 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:38,825 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jeric', 'jeric')
+2026-07-15 13:52:38,974 INFO: DB_SQL_SUCCESS: Query completed in 0.1489s
+2026-07-15 13:52:39,198 INFO: HTTP_RESPONSE: POST /login -> Status 200 OK
+2026-07-15 13:52:45,864 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:45,865 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jeric', 'jeric')
+2026-07-15 13:52:45,869 INFO: DB_SQL_SUCCESS: Query completed in 0.0038s
+2026-07-15 13:52:46,093 INFO: DB_SQL: executing: SELECT id, full_name, center_name, position, profile_photo, theme FROM teachers WHERE user_id = %s with params: (1,)
+2026-07-15 13:52:46,107 INFO: DB_SQL_SUCCESS: Query completed in 0.0141s
+2026-07-15 13:52:46,108 INFO: HTTP_RESPONSE: POST /login -> Status 302 FOUND
+2026-07-15 13:52:46,116 INFO: HTTP_REQUEST: GET /teacher/dashboard | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:46,116 INFO: DB_SQL: executing: SELECT c.*,             (SELECT COUNT(*) FROM classroom_learners cl WHERE cl.classroom_id = c.id) as learners_count            FROM classrooms c WHERE c.teacher_id = %s with params: (1,)
+2026-07-15 13:52:46,123 INFO: DB_SQL_SUCCESS: Query completed in 0.0072s
+2026-07-15 13:52:46,124 INFO: DB_SQL: executing: SELECT COUNT(*) as count FROM posts WHERE classroom_id IN (%s) with params: (1,)
+2026-07-15 13:52:46,141 INFO: DB_SQL_SUCCESS: Query completed in 0.0172s
+2026-07-15 13:52:46,171 INFO: HTTP_RESPONSE: GET /teacher/dashboard -> Status 200 OK
+2026-07-15 13:52:53,591 INFO: HTTP_REQUEST: GET /teacher/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:53,608 INFO: HTTP_RESPONSE: GET /teacher/settings -> Status 200 OK
+2026-07-15 13:52:56,710 INFO: HTTP_REQUEST: POST /teacher/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:56,711 INFO: DB_SQL: executing: UPDATE teachers SET theme = %s WHERE id = %s with params: ('rainbow', 1)
+2026-07-15 13:52:56,717 INFO: DB_SQL_SUCCESS: Query completed in 0.0058s
+2026-07-15 13:52:56,717 INFO: HTTP_RESPONSE: POST /teacher/settings -> Status 302 FOUND
+2026-07-15 13:52:56,726 INFO: HTTP_REQUEST: GET /teacher/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:52:56,727 INFO: HTTP_RESPONSE: GET /teacher/settings -> Status 200 OK
+2026-07-15 13:53:00,391 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:00,393 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-15 13:53:02,256 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:02,257 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-15 13:53:10,304 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:10,305 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jenrie', 'jenrie')
+2026-07-15 13:53:10,309 INFO: DB_SQL_SUCCESS: Query completed in 0.0042s
+2026-07-15 13:53:10,542 INFO: HTTP_RESPONSE: POST /login -> Status 200 OK
+2026-07-15 13:53:17,739 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:17,740 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jasmine', 'jasmine')
+2026-07-15 13:53:17,744 INFO: DB_SQL_SUCCESS: Query completed in 0.0035s
+2026-07-15 13:53:18,003 INFO: DB_SQL: executing: SELECT id, parent_name, mobile, address, theme FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:18,021 INFO: DB_SQL_SUCCESS: Query completed in 0.0175s
+2026-07-15 13:53:18,021 INFO: DB_SQL: executing: SELECT id, learner_id, full_name, center_name, photo, gender, birthdate FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:18,038 INFO: DB_SQL_SUCCESS: Query completed in 0.0170s
+2026-07-15 13:53:18,039 INFO: HTTP_RESPONSE: POST /login -> Status 302 FOUND
+2026-07-15 13:53:18,045 INFO: HTTP_REQUEST: GET /parent/dashboard | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:18,046 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-15 13:53:18,068 INFO: DB_SQL_SUCCESS: Query completed in 0.0228s
+2026-07-15 13:53:18,069 INFO: DB_SQL: executing: SELECT COUNT(*) as count FROM classroom_learners WHERE learner_id = %s with params: (2,)
+2026-07-15 13:53:18,083 INFO: DB_SQL_SUCCESS: Query completed in 0.0147s
+2026-07-15 13:53:18,084 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC LIMIT 1 with params: (2,)
+2026-07-15 13:53:18,103 INFO: DB_SQL_SUCCESS: Query completed in 0.0194s
+2026-07-15 13:53:18,115 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:18,130 INFO: DB_SQL_SUCCESS: Query completed in 0.0151s
+2026-07-15 13:53:18,130 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:18,152 INFO: DB_SQL_SUCCESS: Query completed in 0.0220s
+2026-07-15 13:53:18,152 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:18,174 INFO: DB_SQL_SUCCESS: Query completed in 0.0215s
+2026-07-15 13:53:18,174 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:18,205 INFO: DB_SQL_SUCCESS: Query completed in 0.0304s
+2026-07-15 13:53:18,205 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:18,220 INFO: DB_SQL_SUCCESS: Query completed in 0.0150s
+2026-07-15 13:53:18,223 INFO: HTTP_RESPONSE: GET /parent/dashboard -> Status 200 OK
+2026-07-15 13:53:20,347 INFO: HTTP_REQUEST: GET /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:20,361 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:20,383 INFO: DB_SQL_SUCCESS: Query completed in 0.0218s
+2026-07-15 13:53:20,383 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:20,403 INFO: DB_SQL_SUCCESS: Query completed in 0.0192s
+2026-07-15 13:53:20,403 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:20,406 INFO: DB_SQL_SUCCESS: Query completed in 0.0031s
+2026-07-15 13:53:20,406 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:20,434 INFO: DB_SQL_SUCCESS: Query completed in 0.0275s
+2026-07-15 13:53:20,434 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:20,450 INFO: DB_SQL_SUCCESS: Query completed in 0.0156s
+2026-07-15 13:53:20,451 INFO: HTTP_RESPONSE: GET /parent/settings -> Status 200 OK
+2026-07-15 13:53:23,152 INFO: HTTP_REQUEST: POST /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:23,153 INFO: DB_SQL: executing: UPDATE parents SET theme = %s WHERE id = %s with params: ('rainbow', 2)
+2026-07-15 13:53:23,175 INFO: DB_SQL_SUCCESS: Query completed in 0.0222s
+2026-07-15 13:53:23,176 INFO: HTTP_RESPONSE: POST /parent/settings -> Status 302 FOUND
+2026-07-15 13:53:23,183 INFO: HTTP_REQUEST: GET /parent/settings | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:23,183 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:23,213 INFO: DB_SQL_SUCCESS: Query completed in 0.0294s
+2026-07-15 13:53:23,213 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:23,230 INFO: DB_SQL_SUCCESS: Query completed in 0.0162s
+2026-07-15 13:53:23,230 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:23,247 INFO: DB_SQL_SUCCESS: Query completed in 0.0172s
+2026-07-15 13:53:23,248 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:23,264 INFO: DB_SQL_SUCCESS: Query completed in 0.0160s
+2026-07-15 13:53:23,265 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:23,283 INFO: DB_SQL_SUCCESS: Query completed in 0.0179s
+2026-07-15 13:53:23,287 INFO: HTTP_RESPONSE: GET /parent/settings -> Status 200 OK
+2026-07-15 13:53:26,937 INFO: HTTP_REQUEST: GET /parent/dashboard | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:26,938 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-15 13:53:26,942 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-15 13:53:26,942 INFO: DB_SQL: executing: SELECT COUNT(*) as count FROM classroom_learners WHERE learner_id = %s with params: (2,)
+2026-07-15 13:53:26,946 INFO: DB_SQL_SUCCESS: Query completed in 0.0037s
+2026-07-15 13:53:26,946 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC LIMIT 1 with params: (2,)
+2026-07-15 13:53:26,961 INFO: DB_SQL_SUCCESS: Query completed in 0.0142s
+2026-07-15 13:53:26,961 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:26,965 INFO: DB_SQL_SUCCESS: Query completed in 0.0039s
+2026-07-15 13:53:26,965 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:26,980 INFO: DB_SQL_SUCCESS: Query completed in 0.0143s
+2026-07-15 13:53:26,980 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:26,999 INFO: DB_SQL_SUCCESS: Query completed in 0.0189s
+2026-07-15 13:53:27,000 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:27,016 INFO: DB_SQL_SUCCESS: Query completed in 0.0163s
+2026-07-15 13:53:27,016 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:27,032 INFO: DB_SQL_SUCCESS: Query completed in 0.0161s
+2026-07-15 13:53:27,034 INFO: HTTP_RESPONSE: GET /parent/dashboard -> Status 200 OK
+2026-07-15 13:53:28,624 INFO: HTTP_REQUEST: GET /parent/child | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:28,624 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-15 13:53:28,647 INFO: DB_SQL_SUCCESS: Query completed in 0.0230s
+2026-07-15 13:53:28,648 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC with params: (2,)
+2026-07-15 13:53:28,665 INFO: DB_SQL_SUCCESS: Query completed in 0.0176s
+2026-07-15 13:53:28,666 INFO: DB_SQL: executing: SELECT * FROM attendance WHERE learner_id = %s ORDER BY date DESC LIMIT 15 with params: (2,)
+2026-07-15 13:53:28,671 INFO: DB_SQL_SUCCESS: Query completed in 0.0055s
+2026-07-15 13:53:28,672 INFO: DB_SQL: executing: SELECT a.*, cw.title, cw.subject_folder FROM assessments a            JOIN classwork cw ON a.classwork_id = cw.id            WHERE a.learner_id = %s            ORDER BY a.graded_at DESC with params: (2,)
+2026-07-15 13:53:28,700 INFO: DB_SQL_SUCCESS: Query completed in 0.0282s
+2026-07-15 13:53:28,731 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:28,749 INFO: DB_SQL_SUCCESS: Query completed in 0.0186s
+2026-07-15 13:53:28,750 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:28,772 INFO: DB_SQL_SUCCESS: Query completed in 0.0219s
+2026-07-15 13:53:28,772 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:28,789 INFO: DB_SQL_SUCCESS: Query completed in 0.0169s
+2026-07-15 13:53:28,790 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:28,817 INFO: DB_SQL_SUCCESS: Query completed in 0.0272s
+2026-07-15 13:53:28,818 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:28,847 INFO: DB_SQL_SUCCESS: Query completed in 0.0288s
+2026-07-15 13:53:28,849 INFO: HTTP_RESPONSE: GET /parent/child -> Status 200 OK
+2026-07-15 13:53:31,386 INFO: HTTP_REQUEST: GET /parent/announcements | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:31,387 INFO: DB_SQL: executing: SELECT c.teacher_id FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            WHERE cl.learner_id = %s LIMIT 1 with params: (2,)
+2026-07-15 13:53:31,390 INFO: DB_SQL_SUCCESS: Query completed in 0.0033s
+2026-07-15 13:53:31,390 INFO: DB_SQL: executing: SELECT a.*, t.full_name as teacher_name, t.center_name                FROM announcements a                JOIN teachers t ON a.teacher_id = t.id                WHERE a.teacher_id IN (                    SELECT c.teacher_id FROM classrooms c                    JOIN classroom_learners cl ON cl.classroom_id = c.id                    WHERE cl.learner_id = %s                )                OR t.center_name = %s                ORDER BY a.created_at DESC with params: (2, 'Kinder')
+2026-07-15 13:53:31,416 INFO: DB_SQL_SUCCESS: Query completed in 0.0253s
+2026-07-15 13:53:31,434 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:31,448 INFO: DB_SQL_SUCCESS: Query completed in 0.0140s
+2026-07-15 13:53:31,448 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:31,464 INFO: DB_SQL_SUCCESS: Query completed in 0.0159s
+2026-07-15 13:53:31,465 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:31,482 INFO: DB_SQL_SUCCESS: Query completed in 0.0177s
+2026-07-15 13:53:31,483 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:31,488 INFO: DB_SQL_SUCCESS: Query completed in 0.0048s
+2026-07-15 13:53:31,488 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:31,516 INFO: DB_SQL_SUCCESS: Query completed in 0.0274s
+2026-07-15 13:53:31,518 INFO: HTTP_RESPONSE: GET /parent/announcements -> Status 200 OK
+2026-07-15 13:53:33,245 INFO: HTTP_REQUEST: GET /notifications | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:33,246 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:33,251 INFO: DB_SQL_SUCCESS: Query completed in 0.0049s
+2026-07-15 13:53:33,266 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:33,280 INFO: DB_SQL_SUCCESS: Query completed in 0.0135s
+2026-07-15 13:53:33,280 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:33,284 INFO: DB_SQL_SUCCESS: Query completed in 0.0034s
+2026-07-15 13:53:33,284 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:33,298 INFO: DB_SQL_SUCCESS: Query completed in 0.0140s
+2026-07-15 13:53:33,299 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:33,315 INFO: DB_SQL_SUCCESS: Query completed in 0.0165s
+2026-07-15 13:53:33,316 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:33,331 INFO: DB_SQL_SUCCESS: Query completed in 0.0160s
+2026-07-15 13:53:33,333 INFO: HTTP_RESPONSE: GET /notifications -> Status 200 OK
+2026-07-15 13:53:34,753 INFO: HTTP_REQUEST: GET /parent/enroll | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:34,755 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name, t.center_name,                (SELECT COUNT(*) FROM classroom_learners cl WHERE cl.classroom_id = c.id) as learners_count,                (SELECT status FROM enrollment_requests er WHERE er.classroom_id = c.id AND er.learner_id = %s ORDER BY created_at DESC LIMIT 1) as request_status,                (SELECT id FROM classroom_learners cl2 WHERE cl2.classroom_id = c.id AND cl2.learner_id = %s) as is_enrolled                FROM classrooms c                JOIN teachers t ON c.teacher_id = t.id                WHERE c.status = 'active'                ORDER BY c.created_at DESC with params: (2, 2)
+2026-07-15 13:53:34,787 INFO: DB_SQL_SUCCESS: Query completed in 0.0321s
+2026-07-15 13:53:34,804 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:34,832 INFO: DB_SQL_SUCCESS: Query completed in 0.0277s
+2026-07-15 13:53:34,833 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:34,837 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-15 13:53:34,837 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:34,851 INFO: DB_SQL_SUCCESS: Query completed in 0.0134s
+2026-07-15 13:53:34,851 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:34,867 INFO: DB_SQL_SUCCESS: Query completed in 0.0161s
+2026-07-15 13:53:34,868 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:34,887 INFO: DB_SQL_SUCCESS: Query completed in 0.0185s
+2026-07-15 13:53:34,891 INFO: HTTP_RESPONSE: GET /parent/enroll -> Status 200 OK
+2026-07-15 13:53:36,777 INFO: HTTP_REQUEST: GET /parent/classroom/1 | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-15 13:53:36,777 INFO: DB_SQL: executing: SELECT * FROM classroom_learners WHERE classroom_id = %s AND learner_id = %s with params: (1, 2)
+2026-07-15 13:53:36,800 INFO: DB_SQL_SUCCESS: Query completed in 0.0225s
+2026-07-15 13:53:36,800 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN teachers t ON c.teacher_id = t.id            WHERE c.id = %s with params: (1,)
+2026-07-15 13:53:36,821 INFO: DB_SQL_SUCCESS: Query completed in 0.0208s
+2026-07-15 13:53:36,822 INFO: DB_SQL: executing: SELECT * FROM attendance WHERE classroom_id = %s AND learner_id = %s ORDER BY date DESC with params: (1, 2)
+2026-07-15 13:53:36,838 INFO: DB_SQL_SUCCESS: Query completed in 0.0162s
+2026-07-15 13:53:36,838 INFO: DB_SQL: executing: SELECT cw.*, a.score, a.remarks, a.graded_at             FROM classwork cw            LEFT JOIN assessments a ON cw.id = a.classwork_id AND a.learner_id = %s            WHERE cw.classroom_id = %s            ORDER BY cw.created_at DESC with params: (2, 1)
+2026-07-15 13:53:36,853 INFO: DB_SQL_SUCCESS: Query completed in 0.0146s
+2026-07-15 13:53:36,870 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-15 13:53:36,882 INFO: DB_SQL_SUCCESS: Query completed in 0.0119s
+2026-07-15 13:53:36,882 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-15 13:53:36,899 INFO: DB_SQL_SUCCESS: Query completed in 0.0172s
+2026-07-15 13:53:36,900 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-16', 2)
+2026-07-15 13:53:36,916 INFO: DB_SQL_SUCCESS: Query completed in 0.0164s
+2026-07-15 13:53:36,917 INFO: DB_SQL: executing: SELECT id FROM notifications WHERE user_id = %s AND title = 'Upcoming Deadline' AND message = %s with params: (3, "Reminder: 'Math' is due tomorrow!")
+2026-07-15 13:53:36,933 INFO: DB_SQL_SUCCESS: Query completed in 0.0162s
+2026-07-15 13:53:36,933 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-15 13:53:36,949 INFO: DB_SQL_SUCCESS: Query completed in 0.0158s
+2026-07-15 13:53:36,952 INFO: HTTP_RESPONSE: GET /parent/classroom/1 -> Status 200 OK
