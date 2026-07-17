@@ -206,12 +206,20 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body {% if session.get('theme') == 'dark' %}data-bs-theme="dark"{% endif %}>
+    <style>
+        .text-gradient-green {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+    </style>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-3">
         <div class="container">
-            <a class="navbar-brand text-success d-flex align-items-center" href="{{ url_for('main.landing') }}">
-                <i class="bi bi-rocket-takeoff-fill me-2 fs-3 text-warning"></i>
-                <span class="fs-4">ECCD System</span>
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.landing') }}">
+                <span class="fs-4 text-gradient-green" style="letter-spacing: -0.5px;">ECCD System</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

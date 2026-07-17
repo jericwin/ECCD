@@ -1,116 +1,140 @@
 {% extends 'base.html' %}
 
-{% block title %}Teacher Registration - ECCD System{% endblock %}
+{% block title %}Educator Registration - ECCD System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-4">
-    <div class="col-lg-8">
-        <div class="card p-4 p-md-5 border-0 shadow">
-            <div class="text-center mb-4">
-                <i class="bi bi-person-workspace text-primary fs-1"></i>
-                <h3 class="fw-bold mt-2">Teacher Registration</h3>
-                <p class="text-muted">Create an administrator/teacher account to manage classrooms</p>
+<div class="row justify-content-center py-5">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="bg-primary bg-gradient p-4 p-md-5 text-center text-white">
+                <div class="mb-3">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle shadow-sm" style="width: 70px; height: 70px;">
+                        <i class="bi bi-person-workspace fs-1"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-1">Educator Registration</h2>
+                <p class="text-white-50 mb-0">Create an administrator account to manage classrooms</p>
             </div>
             
-            <form action="{{ url_for('auth.register_teacher') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold"><i class="bi bi-person-badge"></i> Profile & Identification</h5>
-                
-                <div class="row g-3 mb-4">
-                    <!-- Profile Photo -->
-                    <div class="col-md-6">
-                        <label for="profile_photo" class="form-label fw-semibold">Profile Photo</label>
-                        <input type="file" class="form-control" id="profile_photo" name="profile_photo" accept="image/*">
-                        <small class="text-muted">Upload a professional photo (JPG, PNG, max 5MB)</small>
+            <div class="p-4 p-md-5 bg-white">
+                <form action="{{ url_for('auth.register_teacher') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-2">
+                            <i class="bi bi-person-badge fs-5"></i>
+                        </div>
+                        <h5 class="fw-bold text-primary mb-0">Profile & Identification</h5>
                     </div>
-                    <!-- Full Name -->
-                    <div class="col-md-6">
-                        <label for="full_name" class="form-label fw-semibold">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" placeholder="E.g., Maria Santos" value="{{ form_data.full_name or '' }}" required>
-                        <div class="invalid-feedback">Please enter your full name.</div>
+                    
+                    <div class="row g-4 mb-5">
+                        <!-- Profile Photo -->
+                        <div class="col-md-6">
+                            <label for="profile_photo" class="form-label text-dark fw-semibold">Profile Photo</label>
+                            <input type="file" class="form-control bg-light border-0" id="profile_photo" name="profile_photo" accept="image/*">
+                            <small class="text-muted" style="font-size: 0.75rem;">JPG, PNG (max 5MB)</small>
+                        </div>
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label text-dark fw-semibold">Full Name</label>
+                            <input type="text" class="form-control bg-light border-0" id="full_name" name="full_name" placeholder="E.g., Maria Santos" value="{{ form_data.full_name or '' }}" required>
+                            <div class="invalid-feedback">Please enter your full name.</div>
+                        </div>
+                        <!-- Employee ID -->
+                        <div class="col-md-6">
+                            <label for="employee_id" class="form-label text-dark fw-semibold">Employee ID</label>
+                            <input type="text" class="form-control bg-light border-0" id="employee_id" name="employee_id" placeholder="E.g., EMP-12345" value="{{ form_data.employee_id or '' }}" required>
+                            <div class="invalid-feedback">Please enter your Employee ID.</div>
+                        </div>
+                        <!-- Position -->
+                        <div class="col-md-6">
+                            <label for="position" class="form-label text-dark fw-semibold">Position</label>
+                            <input type="text" class="form-control bg-light border-0" id="position" name="position" placeholder="E.g., Child Development Worker" value="{{ form_data.position or '' }}" required>
+                            <div class="invalid-feedback">Please enter your position.</div>
+                        </div>
+                        <!-- Child Development Center -->
+                        <div class="col-12">
+                            <label for="center_name" class="form-label text-dark fw-semibold">Child Development Center</label>
+                            <input type="text" class="form-control bg-light border-0" id="center_name" name="center_name" placeholder="E.g., Sunshine Kindergarten" value="{{ form_data.center_name or '' }}" required>
+                            <div class="invalid-feedback">Please enter the center name.</div>
+                        </div>
                     </div>
-                    <!-- Employee ID -->
-                    <div class="col-md-6">
-                        <label for="employee_id" class="form-label fw-semibold">Employee ID</label>
-                        <input type="text" class="form-control" id="employee_id" name="employee_id" placeholder="E.g., EMP-12345" value="{{ form_data.employee_id or '' }}" required>
-                        <div class="invalid-feedback">Please enter your Employee ID.</div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 me-2">
+                            <i class="bi bi-telephone fs-5"></i>
+                        </div>
+                        <h5 class="fw-bold text-info mb-0">Contact Information</h5>
                     </div>
-                    <!-- Position -->
-                    <div class="col-md-6">
-                        <label for="position" class="form-label fw-semibold">Position</label>
-                        <input type="text" class="form-control" id="position" name="position" placeholder="E.g., Child Development Worker" value="{{ form_data.position or '' }}" required>
-                        <div class="invalid-feedback">Please enter your position.</div>
+                    
+                    <div class="row g-4 mb-5">
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label for="email" class="form-label text-dark fw-semibold">Email Address</label>
+                            <input type="email" class="form-control bg-light border-0" id="email" name="email" placeholder="E.g., maria@example.com" value="{{ form_data.email or '' }}" required>
+                            <div class="invalid-feedback">Please enter a valid email.</div>
+                        </div>
+                        <!-- Mobile -->
+                        <div class="col-md-6">
+                            <label for="mobile" class="form-label text-dark fw-semibold">Mobile Number</label>
+                            <input type="tel" class="form-control bg-light border-0" id="mobile" name="mobile" placeholder="E.g., 09123456789" value="{{ form_data.mobile or '' }}" required>
+                            <div class="invalid-feedback">Please enter your mobile number.</div>
+                        </div>
+                        <!-- Address -->
+                        <div class="col-12">
+                            <label for="address" class="form-label text-dark fw-semibold">Complete Address</label>
+                            <textarea class="form-control bg-light border-0" id="address" name="address" rows="2" placeholder="Street, Barangay, City, Province" required>{{ form_data.address or '' }}</textarea>
+                            <div class="invalid-feedback">Please enter your complete address.</div>
+                        </div>
                     </div>
-                    <!-- Child Development Center -->
-                    <div class="col-12">
-                        <label for="center_name" class="form-label fw-semibold">Child Development Center</label>
-                        <input type="text" class="form-control" id="center_name" name="center_name" placeholder="E.g., Sunshine Kindergarten Garden" value="{{ form_data.center_name or '' }}" required>
-                        <div class="invalid-feedback">Please enter the center name.</div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2 me-2">
+                            <i class="bi bi-lock fs-5"></i>
+                        </div>
+                        <h5 class="fw-bold text-warning mb-0">Account Credentials</h5>
                     </div>
-                </div>
-                
-                <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold"><i class="bi bi-telephone"></i> Contact Information</h5>
-                <div class="row g-3 mb-4">
-                    <!-- Email -->
-                    <div class="col-md-6">
-                        <label for="email" class="form-label fw-semibold">Email Address</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="E.g., maria@example.com" value="{{ form_data.email or '' }}" required>
-                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    
+                    <div class="row g-4 mb-4">
+                        <!-- Username -->
+                        <div class="col-12">
+                            <label for="username" class="form-label text-dark fw-semibold">Username</label>
+                            <input type="text" class="form-control bg-light border-0" id="username" name="username" placeholder="Choose a username" value="{{ form_data.username or '' }}" required>
+                            <div class="invalid-feedback">Please choose a username.</div>
+                        </div>
+                        <!-- Password -->
+                        <div class="col-md-6">
+                            <label for="password" class="form-label text-dark fw-semibold">Password</label>
+                            <input type="password" class="form-control bg-light border-0" id="password" name="password" placeholder="Create password" required>
+                            <div class="invalid-feedback">Please enter a password.</div>
+                        </div>
+                        <!-- Confirm Password -->
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label text-dark fw-semibold">Confirm Password</label>
+                            <input type="password" class="form-control bg-light border-0" id="confirm_password" name="confirm_password" placeholder="Verify password" required>
+                            <div class="invalid-feedback">Please confirm your password.</div>
+                        </div>
+                        <!-- Security Answer -->
+                        <div class="col-12">
+                            <label for="security_answer" class="form-label text-dark fw-semibold">Security Question: What was the name of your first school?</label>
+                            <input type="text" class="form-control bg-light border-0" id="security_answer" name="security_answer" placeholder="Your answer (used for recovery)" required>
+                            <div class="invalid-feedback">Please enter your security question answer.</div>
+                        </div>
                     </div>
-                    <!-- Mobile -->
-                    <div class="col-md-6">
-                        <label for="mobile" class="form-label fw-semibold">Mobile Number</label>
-                        <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="E.g., 09123456789" value="{{ form_data.mobile or '' }}" required>
-                        <div class="invalid-feedback">Please enter your mobile number.</div>
+                    
+                    <!-- Terms Check -->
+                    <div class="mb-5 form-check mt-3">
+                        <input type="checkbox" class="form-check-input" id="agree" name="agree" required>
+                        <label class="form-check-label text-secondary small" for="agree">I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-primary text-decoration-none fw-semibold border-bottom border-primary border-opacity-50">Terms of Service and Privacy Policy</a></label>
+                        <div class="invalid-feedback">You must agree before registering.</div>
                     </div>
-                    <!-- Address -->
-                    <div class="col-12">
-                        <label for="address" class="form-label fw-semibold">Complete Address</label>
-                        <textarea class="form-control" id="address" name="address" rows="2" placeholder="Street, Barangay, City, Province" required>{{ form_data.address or '' }}</textarea>
-                        <div class="invalid-feedback">Please enter your complete address.</div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-between gap-3 pt-4 border-top border-light">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-light rounded-pill px-5 fw-semibold text-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">Create Account</button>
                     </div>
-                </div>
-                
-                <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold"><i class="bi bi-lock"></i> Account Credentials</h5>
-                <div class="row g-3 mb-4">
-                    <!-- Username -->
-                    <div class="col-12">
-                        <label for="username" class="form-label fw-semibold">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" value="{{ form_data.username or '' }}" required>
-                        <div class="invalid-feedback">Please choose a username.</div>
-                    </div>
-                    <!-- Password -->
-                    <div class="col-md-6">
-                        <label for="password" class="form-label fw-semibold">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
-                        <div class="invalid-feedback">Please enter a password.</div>
-                    </div>
-                    <!-- Confirm Password -->
-                    <div class="col-md-6">
-                        <label for="confirm_password" class="form-label fw-semibold">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Verify password" required>
-                        <div class="invalid-feedback">Please confirm your password.</div>
-                    </div>
-                    <!-- Security Answer -->
-                    <div class="col-12">
-                        <label for="security_answer" class="form-label fw-semibold">Security Question: What was the name of your first school?</label>
-                        <input type="text" class="form-control" id="security_answer" name="security_answer" placeholder="Your answer (used for recovery)" required>
-                        <div class="invalid-feedback">Please enter your security question answer.</div>
-                    </div>
-                </div>
-                
-                <!-- Terms Check -->
-                <div class="mb-4 form-check">
-                    <input type="checkbox" class="form-check-input" id="agree" name="agree" required>
-                    <label class="form-check-label text-muted" for="agree">I agree to the Terms of Service and Privacy Policy</label>
-                    <div class="invalid-feedback">You must agree before registering.</div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="d-flex justify-content-between gap-3">
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary px-4">Cancel</a>
-                    <button type="submit" class="btn btn-primary px-5 text-white fw-bold">Register Account</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -132,4 +156,39 @@
     })
 })()
 </script>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-light border-bottom-0">
+        <h5 class="modal-title fw-bold text-dark" id="termsModalLabel">Terms of Service & Privacy Policy</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-secondary" style="font-size: 0.9rem; line-height: 1.6;">
+        <h6 class="fw-bold text-dark"><i class="bi bi-check-circle-fill text-primary me-2"></i>1. Acceptance of Terms</h6>
+        <p class="mb-4">By registering for an account on the ECCD Monitoring System, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use the system.</p>
+        
+        <h6 class="fw-bold text-dark"><i class="bi bi-shield-lock-fill text-primary me-2"></i>2. Privacy & Data Collection</h6>
+        <p>We are committed to protecting your privacy and the privacy of your children. The ECCD system collects personal and academic information necessary for early childhood monitoring, including but not limited to:</p>
+        <ul class="mb-4">
+            <li>Names, birthdates, and contact details</li>
+            <li>Growth and health metrics (BMI)</li>
+            <li>Attendance and learning progress</li>
+            <li>Uploaded legal documents (e.g., Birth Certificates)</li>
+        </ul>
+        <p class="mb-4">This data is strictly accessible only by authorized personnel (assigned teachers and administrators) and is never shared with third parties without your explicit consent, in compliance with the Data Privacy Act.</p>
+        
+        <h6 class="fw-bold text-dark"><i class="bi bi-person-badge-fill text-primary me-2"></i>3. User Responsibilities</h6>
+        <p class="mb-4">You are responsible for maintaining the confidentiality of your account credentials. You agree to provide accurate and updated information and to notify the school immediately of any unauthorized use of your account.</p>
+        
+        <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle-fill text-primary me-2"></i>4. Limitation of Liability</h6>
+        <p class="mb-0">While we strive to ensure data security and accuracy, the ECCD System is provided "as is". We shall not be liable for any indirect, incidental, or consequential damages arising from the use of the platform.</p>
+      </div>
+      <div class="modal-footer border-top-0 bg-light">
+        <button type="button" class="btn btn-primary px-4 rounded-pill fw-semibold" data-bs-dismiss="modal">I Understand</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

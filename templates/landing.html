@@ -1,88 +1,297 @@
 {% extends 'base.html' %}
 
-{% block title %}Welcome - ECCD Monitoring & Analytics{% endblock %}
+{% block title %}Welcome - ECCD Monitoring System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* OVERRIDE BASE HTML CONTAINER FOR LANDING PAGE TO GO EDGE-TO-EDGE */
+    main.container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    body {
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        background-color: #ffffff;
+    }
+
+    /* Custom Animations */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+    @keyframes pulse-soft {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.8; }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0; /* starts hidden */
+    }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+
+    .floating-element {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    /* Scroll Animation Classes */
+    .reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Gradients and Styling */
+    .hero-section {
+        background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+        position: relative;
+        overflow: hidden;
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+        /* No border radius, pure edge-to-edge */
+    }
+    
+    .blob {
+        position: absolute;
+        filter: blur(80px);
+        z-index: 0;
+        border-radius: 50%;
+        animation: pulse-soft 8s infinite alternate;
+    }
+    .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: rgba(134, 239, 172, 0.4); }
+    .blob-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: rgba(147, 197, 253, 0.4); }
+    
+    .feature-card {
+        transition: all 0.4s ease;
+        border: 2px solid transparent;
+        cursor: default;
+    }
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        border-color: #10b981;
+    }
+    
+    .icon-box-lg {
+        width: 80px;
+        height: 80px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 24px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .about-section { padding: 6rem 0; background-color: #ffffff; }
+    .modules-section { padding: 6rem 0; background-color: #f8fafc; }
+    
+    /* Specific Colors */
+    .text-emerald { color: #10b981; }
+    .bg-emerald-soft { background-color: #d1fae5; color: #10b981; }
+    .bg-indigo-soft { background-color: #e0e7ff; color: #4f46e5; }
+    .bg-amber-soft { background-color: #fef3c7; color: #d97706; }
+    .bg-rose-soft { background-color: #ffe4e6; color: #e11d48; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row align-items-center justify-content-center py-5">
-    <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
-        <div class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill mb-3">
-            <i class="bi bi-balloon-fill me-1 text-danger"></i> Preschool Care & Development
-        </div>
-        <h1 class="display-4 fw-bold mb-3" style="color: #2c3e50;">
-            ECCD Web-Based <br>
-            <span class="text-success">Monitoring System</span>
-        </h1>
-        <p class="lead text-muted mb-4">
-            Enabling teachers and parents to seamlessly monitor children's attendance, health status (BMI), learning
-            progress, and classroom activities. Empowered with predictive data analytics for early risk identification.
-        </p>
-        <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
-            <a href="{{ url_for('auth.login') }}" class="btn btn-success btn-lg px-4 shadow-sm">
-                <i class="bi bi-box-arrow-in-right me-2"></i> Get Started / Login
-            </a>
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-secondary btn-lg dropdown-toggle px-4"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-plus-fill me-2"></i> Create Account
-                </button>
-                <ul class="dropdown-menu shadow border-0" style="border-radius: 12px;">
-                    <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_teacher') }}"><i
-                                class="bi bi-person-workspace text-primary me-2"></i>Register as Teacher</a></li>
-                    <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_parent') }}"><i
-                                class="bi bi-people-fill text-success me-2"></i>Register as Parent</a></li>
-                </ul>
+<!-- Hero Section -->
+<section class="hero-section text-center text-lg-start shadow-sm mb-0">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    
+    <div class="container position-relative z-1">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="animate-fade-in-up">
+                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill mb-4 border border-success border-opacity-25 shadow-sm">
+                        <i class="bi bi-stars me-1"></i> The Future of Preschool Care
+                    </span>
+                </div>
+                <h1 class="display-3 fw-bold mb-4 text-dark animate-fade-in-up delay-100" style="letter-spacing: -1.5px; line-height: 1.2;">
+                    Nurturing <span class="text-emerald position-relative">Every Child's<svg class="position-absolute w-100 start-0" style="bottom: -10px; height: 12px;" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00018 6.89998C71.0152 -2.1384 146.402 -1.4883 197.808 6.89998" stroke="#10b981" stroke-width="4" stroke-linecap="round"/></svg></span> Potential.
+                </h1>
+                <p class="lead text-secondary mb-5 fs-5 animate-fade-in-up delay-200" style="line-height: 1.7; max-width: 550px;">
+                    A holistic, data-driven platform designed to connect educators and parents. Monitor daily attendance, track health milestones, and predict learning outcomes seamlessly.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start animate-fade-in-up delay-300">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-success btn-lg px-5 rounded-pill shadow-lg fw-bold d-flex align-items-center justify-content-center text-nowrap">
+                        Log In to Portal <i class="bi bi-arrow-right-short fs-4 ms-1"></i>
+                    </a>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-white bg-white text-dark btn-lg px-5 rounded-pill dropdown-toggle border shadow-sm fw-bold d-flex align-items-center justify-content-center text-nowrap" data-bs-toggle="dropdown" aria-expanded="false">
+                            Create Account
+                        </button>
+                        <ul class="dropdown-menu shadow-lg border-0 mt-2 p-2" style="border-radius: 16px; min-width: 240px;">
+                            <li><a class="dropdown-item rounded-3 py-3 fw-medium text-primary d-flex align-items-center" href="{{ url_for('auth.register_teacher') }}">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3"><i class="bi bi-person-workspace fs-5"></i></div>
+                                I'm an Educator
+                            </a></li>
+                            <li><a class="dropdown-item rounded-3 py-3 fw-medium text-success d-flex align-items-center" href="{{ url_for('auth.register_parent') }}">
+                                <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3"><i class="bi bi-people fs-5"></i></div>
+                                I'm a Parent
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 position-relative animate-fade-in-up delay-400">
+                <div class="floating-element text-center">
+                    <img src="https://illustrations.popsy.co/amber/student-going-to-school.svg" alt="ECCD Illustration" class="img-fluid" style="max-height: 450px;">
+                </div>
             </div>
         </div>
     </div>
+</section>
 
-    <div class="col-lg-6 col-md-8 col-sm-10 text-center">
-        <!-- SVG or CSS graphic for welcome illustration -->
-        <div class="card p-5 bg-white border border-light-subtle shadow-sm" style="border-radius: 24px;">
-            <div class="mb-4">
-                <i class="bi bi-rocket-takeoff text-warning" style="font-size: 6rem;"></i>
+<!-- About Section -->
+<section class="about-section">
+    <div class="container reveal">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-5 mb-5 mb-lg-0 text-center">
+                <div class="position-relative d-inline-block">
+                    <div class="bg-success bg-opacity-10 rounded-circle position-absolute top-50 start-50 translate-middle" style="width: 300px; height: 300px; z-index: 0;"></div>
+                    <img src="https://illustrations.popsy.co/amber/keynote-presentation.svg" alt="About ECCD" class="img-fluid position-relative z-1" style="max-height: 350px;">
+                </div>
             </div>
-            <h4 class="fw-bold mb-2">Welcome to ECCD Portal</h4>
-            <p class="text-muted">A dedicated tool for teachers and parents to nurture and monitor early childhood
-                milestones.</p>
-            <div class="row g-3 mt-2 text-start">
-                <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
-                        <i class="bi bi-calendar-check-fill text-primary fs-3 me-2"></i>
-                        <div>
-                            <h6 class="mb-0 fw-bold">Attendance</h6>
-                            <small class="text-muted">Daily tracking</small>
+            <div class="col-lg-6 offset-lg-1">
+                <h6 class="text-emerald fw-bold text-uppercase tracking-wide mb-2">About ECCD System</h6>
+                <h2 class="display-6 fw-bold text-dark mb-4">Empowering Early Childhood Development</h2>
+                <p class="text-secondary fs-5 mb-4" style="line-height: 1.8;">
+                    The Early Childhood Care and Development (ECCD) System bridges the gap between the classroom and the home. We believe that a child's foundational years are the most critical, requiring collaborative effort.
+                </p>
+                <p class="text-secondary mb-4" style="line-height: 1.8;">
+                    Our platform utilizes predictive data analytics to identify at-risk learners early on, enabling timely intervention. By digitalizing records, we ensure that every milestone, health check, and attendance record is securely stored and easily accessible.
+                </p>
+                <div class="d-flex align-items-center gap-4 mt-5">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px;">
+                            <i class="bi bi-check-lg fs-5"></i>
                         </div>
+                        <span class="fw-bold text-dark fs-5">Data Driven</span>
                     </div>
-                </div>
-                <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
-                        <i class="bi bi-heart-pulse-fill text-danger fs-3 me-2"></i>
-                        <div>
-                            <h6 class="mb-0 fw-bold">BMI & Health</h6>
-                            <small class="text-muted">Growth records</small>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px;">
+                            <i class="bi bi-shield-check fs-5"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
-                        <i class="bi bi-journal-bookmark-fill text-success fs-3 me-2"></i>
-                        <div>
-                            <h6 class="mb-0 fw-bold">Classwork</h6>
-                            <small class="text-muted">Daily activities</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 d-flex align-items-center">
-                        <i class="bi bi-graph-up-arrow text-warning fs-3 me-2"></i>
-                        <div>
-                            <h6 class="mb-0 fw-bold">Analytics</h6>
-                            <small class="text-muted">At-risk predictions</small>
-                        </div>
+                        <span class="fw-bold text-dark fs-5">Secure</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Features Section -->
+<section class="modules-section">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h6 class="text-emerald fw-bold text-uppercase tracking-wide mb-2">Core Features</h6>
+            <h2 class="display-6 fw-bold text-dark">Everything You Need to Monitor Growth</h2>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-6 col-lg-3 reveal delay-100">
+                <div class="feature-card card h-100 border-0 rounded-4 shadow-sm p-4 bg-white text-center">
+                    <div class="icon-box-lg bg-indigo-soft mx-auto">
+                        <i class="bi bi-calendar4-week fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold mt-2">Attendance</h4>
+                    <p class="text-secondary mt-3">Digital tracking of daily attendance. Identify chronic absenteeism instantly to keep learners on track.</p>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-md-6 col-lg-3 reveal delay-200">
+                <div class="feature-card card h-100 border-0 rounded-4 shadow-sm p-4 bg-white text-center">
+                    <div class="icon-box-lg bg-rose-soft mx-auto">
+                        <i class="bi bi-heart-pulse fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold mt-2">Health & BMI</h4>
+                    <p class="text-secondary mt-3">Monitor height, weight, and nutritional status. Automated BMI calculation and historical growth charts.</p>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-md-6 col-lg-3 reveal delay-300">
+                <div class="feature-card card h-100 border-0 rounded-4 shadow-sm p-4 bg-white text-center">
+                    <div class="icon-box-lg bg-amber-soft mx-auto">
+                        <i class="bi bi-book fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold mt-2">Classwork</h4>
+                    <p class="text-secondary mt-3">Record daily activities and assessments. Share learning progress with parents in real-time.</p>
+                </div>
+            </div>
+            <!-- Feature 4 -->
+            <div class="col-md-6 col-lg-3 reveal delay-400">
+                <div class="feature-card card h-100 border-0 rounded-4 shadow-sm p-4 bg-white text-center">
+                    <div class="icon-box-lg bg-emerald-soft mx-auto">
+                        <i class="bi bi-graph-up-arrow fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold mt-2">Analytics</h4>
+                    <p class="text-secondary mt-3">Predictive AI algorithms that analyze data to identify at-risk learners, empowering early intervention.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-success bg-gradient text-white text-center position-relative overflow-hidden">
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.3) 0%, transparent 50%);"></div>
+    <div class="container position-relative z-1 py-5 reveal">
+        <h2 class="display-5 fw-bold mb-3">Ready to transform early education?</h2>
+        <p class="lead mb-5 opacity-75">Join our community of educators and parents dedicated to holistic child development.</p>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+            <a href="{{ url_for('auth.register_teacher') }}" class="btn btn-light text-success btn-lg px-5 rounded-pill shadow-lg fw-bold text-nowrap">Register as Educator</a>
+            <a href="{{ url_for('auth.register_parent') }}" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-bold border-2 text-nowrap">Register as Parent</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Intersection Observer for scroll animations
+    document.addEventListener("DOMContentLoaded", function() {
+        const reveals = document.querySelectorAll(".reveal");
+        
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+        
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                } else {
+                    entry.target.classList.add("active");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, revealOptions);
+        
+        reveals.forEach(reveal => {
+            revealOnScroll.observe(reveal);
+        });
+    });
+</script>
 {% endblock %}

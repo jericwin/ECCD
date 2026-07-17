@@ -57,6 +57,34 @@
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Birth Certificate Section -->
+            <div class="row align-items-center mt-3 pt-3 border-top mx-1">
+                <div class="col-md-3 fw-semibold text-muted p-0">
+                    Legal Document:<br>
+                    <small style="font-size: 0.75rem;">(Birth Cert. / PSA)</small>
+                </div>
+                <div class="col-md-9 p-0">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <form action="{{ url_for('parent.upload_birth_cert') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2 m-0">
+                            <input type="file" class="form-control form-control-sm" name="birth_certificate" accept=".pdf,image/*" style="max-width: 220px;" required>
+                            <button type="submit" class="btn btn-sm btn-success text-nowrap"><i class="bi bi-upload"></i> Upload</button>
+                        </form>
+                        {% if learner.birth_certificate %}
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#certPreviewModal">
+                                <i class="bi bi-eye"></i> Preview
+                            </button>
+                        {% else %}
+                            <span class="text-danger small ms-2"><i class="bi bi-exclamation-circle"></i> Not uploaded</span>
+                        {% endif %}
+                    </div>
+                    {% if learner.birth_certificate_remarks %}
+                    <div class="alert alert-info py-2 px-3 mt-2 mb-0 d-inline-block border-0 shadow-sm" style="font-size: 0.85rem; border-radius: 12px;">
+                        <strong><i class="bi bi-chat-text-fill text-primary me-1"></i> Teacher Remarks:</strong> {{ learner.birth_certificate_remarks }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -297,4 +325,30 @@
         {% endif %}
     });
 </script>
+
+<!-- Certificate Preview Modal -->
+{% if learner.birth_certificate %}
+<div class="modal fade" id="certPreviewModal" tabindex="-1" aria-labelledby="certPreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-light border-bottom-0">
+        <h5 class="modal-title fw-bold" id="certPreviewModalLabel"><i class="bi bi-file-earmark-person text-primary me-2"></i>Birth Certificate / PSA</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-0 bg-light">
+        {% if learner.birth_certificate.lower().endswith('.pdf') %}
+            <iframe src="{{ url_for('static', filename='uploads/certificates/' + learner.birth_certificate) }}" style="width: 100%; height: 60vh; border: none;"></iframe>
+        {% else %}
+            <img src="{{ url_for('static', filename='uploads/certificates/' + learner.birth_certificate) }}" class="img-fluid" alt="Birth Certificate Preview" style="max-height: 70vh;">
+        {% endif %}
+      </div>
+      <div class="modal-footer border-top-0 bg-light">
+          <a href="{{ url_for('static', filename='uploads/certificates/' + learner.birth_certificate) }}" target="_blank" class="btn btn-primary"><i class="bi bi-box-arrow-up-right me-1"></i> Open in New Tab</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}

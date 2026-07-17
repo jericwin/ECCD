@@ -1359,3 +1359,33 @@ def settings():
         active_page='settings',
         current_theme=current_theme
     )
+
+@teacher_bp.route('/teacher/learners/birth-cert-remarks', methods=['POST'])
+def update_birth_cert_remarks():
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('auth.login'))
+        
+    teacher = get_teacher_profile(session['user_id'])
+    learner_id = request.form.get('learner_id')
+    remarks = request.form.get('remarks')
+    
+    if not learner_id:
+        flash("Invalid learner ID.", "error")
+        return redirect(request.referrer or url_for('teacher.learners'))
+        
+    execute_query("UPDATE learners SET birth_certificate_remarks = %s WHERE id = %s", (remarks, learner_id), commit=True)
+    
+    # Notify parent
+    learner = execute_query("SELECT parent_id, full_name FROM learners WHERE id = %s", (learner_id,), fetch_one=True)
+    if learner:
+        parent = execute_query("SELECT user_id FROM parents WHERE id = %s", (learner['parent_id'],), fetch_one=True)
+        if parent:
+            msg = f"Teacher {teacher['full_name']} left a remark on {learner['full_name']}'s birth certificate: {remarks}"
+            execute_query(
+                "INSERT INTO notifications (user_id, title, message, link_url) VALUES (%s, %s, %s, %s)",
+                (parent['user_id'], "Birth Certificate Remarks", msg, url_for('parent.child_profile')),
+                commit=True
+            )
+            
+    flash("Remarks saved successfully.", "success")
+    return redirect(request.referrer or url_for('teacher.learners'))

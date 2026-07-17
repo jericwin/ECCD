@@ -267,6 +267,59 @@ def upload_child_photo():
 
     return redirect(request.referrer or url_for('parent.dashboard'))
 
+@parent_bp.route('/parent/child/upload-birth-cert', methods=['POST'])
+def upload_birth_cert():
+    if 'user_id' not in session or session.get('role') != 'parent':
+        return redirect(url_for('auth.login'))
+
+    parent, learner = get_parent_and_child(session['user_id'])
+    if not parent or not learner:
+        flash('Child profile not found.', 'error')
+        return redirect(url_for('parent.dashboard'))
+
+    if 'birth_certificate' not in request.files:
+        flash('No document selected.', 'error')
+        return redirect(request.referrer or url_for('parent.dashboard'))
+
+    file = request.files['birth_certificate']
+    if file.filename == '':
+        flash('No document selected.', 'error')
+        return redirect(request.referrer or url_for('parent.dashboard'))
+
+    allowed_cert_extensions = {'pdf', 'png', 'jpg', 'jpeg'}
+    def allowed_cert_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_cert_extensions
+
+    if file and allowed_cert_file(file.filename):
+        upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'certificates')
+        os.makedirs(upload_dir, exist_ok=True)
+
+        if learner.get('birth_certificate'):
+            old_path = os.path.join(upload_dir, learner['birth_certificate'])
+            if os.path.exists(old_path):
+                os.remove(old_path)
+
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        safe_id = secure_filename(str(learner['learner_id']))
+        cert_filename = f"birth_cert_{safe_id}.{ext}"
+        file.save(os.path.join(upload_dir, cert_filename))
+
+        execute_query(
+            "UPDATE learners SET birth_certificate = %s WHERE id = %s",
+            (cert_filename, learner['id']),
+            commit=True
+        )
+        
+        if 'profile' in session and session.get('role') == 'parent':
+            session['profile']['learner']['birth_certificate'] = cert_filename
+            session.modified = True
+            
+        flash('Birth Certificate uploaded successfully!', 'success')
+    else:
+        flash('Invalid file type. Please upload a PDF, JPG, or PNG file.', 'error')
+
+    return redirect(request.referrer or url_for('parent.dashboard'))
+
 @parent_bp.route('/parent/announcements')
 def announcements():
     if 'user_id' not in session or session.get('role') != 'parent':
