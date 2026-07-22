@@ -76,20 +76,34 @@ def logout():
 @auth_bp.route('/register/teacher', methods=['GET', 'POST'])
 def register_teacher():
     if request.method == 'POST':
-        full_name = request.form.get('full_name')
+        first_name = request.form.get('first_name', '')
+        middle_name = request.form.get('middle_name', '')
+        last_name = request.form.get('last_name', '')
+        extension = request.form.get('extension', '')
+        full_name = f"{first_name} {middle_name} {last_name} {extension}".strip().replace('  ', ' ')
+        
         employee_id = request.form.get('employee_id')
         position = request.form.get('position')
         center_name = request.form.get('center_name')
         email = request.form.get('email')
         mobile = request.form.get('mobile')
-        address = request.form.get('address')
+        
+        region_name = request.form.get('region_name', '')
+        province_name = request.form.get('province_name', '')
+        city_name = request.form.get('city_name', '')
+        barangay_name = request.form.get('barangay_name', '')
+        house_number = request.form.get('house_number', '')
+        zipcode = request.form.get('zipcode', '')
+        address = f"{house_number}, {barangay_name}, {city_name}, {province_name}, {region_name} {zipcode}".strip(', ')
+            
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         security_answer = request.form.get('security_answer')
         
         form_data = {
-            'full_name': full_name, 'employee_id': employee_id, 'position': position,
+            'first_name': first_name, 'middle_name': middle_name, 'last_name': last_name, 'extension': extension,
+            'employee_id': employee_id, 'position': position,
             'center_name': center_name, 'email': email, 'mobile': mobile,
             'address': address, 'username': username
         }
@@ -158,11 +172,24 @@ def register_teacher():
 def register_parent():
     if request.method == 'POST':
         # Parent fields
-        parent_name = request.form.get('parent_name')
+        first_name = request.form.get('first_name', '')
+        middle_name = request.form.get('middle_name', '')
+        last_name = request.form.get('last_name', '')
+        extension = request.form.get('extension', '')
+        parent_name = f"{first_name} {middle_name} {last_name} {extension}".strip().replace('  ', ' ')
+        
         email = request.form.get('email')
         mobile = request.form.get('mobile')
         relationship = request.form.get('relationship')
-        address = request.form.get('address')
+        
+        region_name = request.form.get('region_name', '')
+        province_name = request.form.get('province_name', '')
+        city_name = request.form.get('city_name', '')
+        barangay_name = request.form.get('barangay_name', '')
+        house_number = request.form.get('house_number', '')
+        zipcode = request.form.get('zipcode', '')
+        address = f"{house_number}, {barangay_name}, {city_name}, {province_name}, {region_name} {zipcode}".strip(', ')
+            
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
@@ -175,7 +202,8 @@ def register_parent():
         birthdate = request.form.get('birthdate')
         
         form_data = {
-            'parent_name': parent_name, 'email': email, 'mobile': mobile,
+            'first_name': first_name, 'middle_name': middle_name, 'last_name': last_name, 'extension': extension,
+            'email': email, 'mobile': mobile,
             'relationship': relationship, 'address': address, 'username': username,
             'learner_full_name': learner_full_name, 'learner_id': learner_id, 'center_name': center_name,
             'gender': gender, 'birthdate': birthdate

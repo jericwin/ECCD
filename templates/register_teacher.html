@@ -27,33 +27,46 @@
                     </div>
                     
                     <div class="row g-4 mb-5">
+                        <!-- Name Parts -->
+                        <div class="col-md-3">
+                            <label for="first_name" class="form-label text-dark fw-semibold">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light border-0" id="first_name" name="first_name" placeholder="Maria" value="{{ form_data.first_name or '' }}" required>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="middle_name" class="form-label text-dark fw-semibold">Middle Name</label>
+                            <input type="text" class="form-control bg-light border-0" id="middle_name" name="middle_name" placeholder="Dela" value="{{ form_data.middle_name or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="last_name" class="form-label text-dark fw-semibold">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light border-0" id="last_name" name="last_name" placeholder="Santos" value="{{ form_data.last_name or '' }}" required>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="extension" class="form-label text-dark fw-semibold">Ext</label>
+                            <input type="text" class="form-control bg-light border-0" id="extension" name="extension" placeholder="Jr." value="{{ form_data.extension or '' }}">
+                        </div>
                         <!-- Profile Photo -->
                         <div class="col-md-6">
                             <label for="profile_photo" class="form-label text-dark fw-semibold">Profile Photo</label>
                             <input type="file" class="form-control bg-light border-0" id="profile_photo" name="profile_photo" accept="image/*">
                             <small class="text-muted" style="font-size: 0.75rem;">JPG, PNG (max 5MB)</small>
                         </div>
-                        <!-- Full Name -->
-                        <div class="col-md-6">
-                            <label for="full_name" class="form-label text-dark fw-semibold">Full Name</label>
-                            <input type="text" class="form-control bg-light border-0" id="full_name" name="full_name" placeholder="E.g., Maria Santos" value="{{ form_data.full_name or '' }}" required>
-                            <div class="invalid-feedback">Please enter your full name.</div>
-                        </div>
                         <!-- Employee ID -->
                         <div class="col-md-6">
-                            <label for="employee_id" class="form-label text-dark fw-semibold">Employee ID</label>
+                            <label for="employee_id" class="form-label text-dark fw-semibold">Employee ID <span class="text-danger">*</span></label>
                             <input type="text" class="form-control bg-light border-0" id="employee_id" name="employee_id" placeholder="E.g., EMP-12345" value="{{ form_data.employee_id or '' }}" required>
                             <div class="invalid-feedback">Please enter your Employee ID.</div>
                         </div>
                         <!-- Position -->
                         <div class="col-md-6">
-                            <label for="position" class="form-label text-dark fw-semibold">Position</label>
+                            <label for="position" class="form-label text-dark fw-semibold">Position <span class="text-danger">*</span></label>
                             <input type="text" class="form-control bg-light border-0" id="position" name="position" placeholder="E.g., Child Development Worker" value="{{ form_data.position or '' }}" required>
                             <div class="invalid-feedback">Please enter your position.</div>
                         </div>
                         <!-- Child Development Center -->
                         <div class="col-12">
-                            <label for="center_name" class="form-label text-dark fw-semibold">Child Development Center</label>
+                            <label for="center_name" class="form-label text-dark fw-semibold">Child Development Center <span class="text-danger">*</span></label>
                             <input type="text" class="form-control bg-light border-0" id="center_name" name="center_name" placeholder="E.g., Sunshine Kindergarten" value="{{ form_data.center_name or '' }}" required>
                             <div class="invalid-feedback">Please enter the center name.</div>
                         </div>
@@ -69,21 +82,58 @@
                     <div class="row g-4 mb-5">
                         <!-- Email -->
                         <div class="col-md-6">
-                            <label for="email" class="form-label text-dark fw-semibold">Email Address</label>
+                            <label for="email" class="form-label text-dark fw-semibold">Email Address <span class="text-danger">*</span></label>
                             <input type="email" class="form-control bg-light border-0" id="email" name="email" placeholder="E.g., maria@example.com" value="{{ form_data.email or '' }}" required>
                             <div class="invalid-feedback">Please enter a valid email.</div>
                         </div>
                         <!-- Mobile -->
                         <div class="col-md-6">
-                            <label for="mobile" class="form-label text-dark fw-semibold">Mobile Number</label>
+                            <label for="mobile" class="form-label text-dark fw-semibold">Mobile Number <span class="text-danger">*</span></label>
                             <input type="tel" class="form-control bg-light border-0" id="mobile" name="mobile" placeholder="E.g., 09123456789" value="{{ form_data.mobile or '' }}" required>
                             <div class="invalid-feedback">Please enter your mobile number.</div>
                         </div>
                         <!-- Address -->
                         <div class="col-12">
-                            <label for="address" class="form-label text-dark fw-semibold">Complete Address</label>
-                            <textarea class="form-control bg-light border-0" id="address" name="address" rows="2" placeholder="Street, Barangay, City, Province" required>{{ form_data.address or '' }}</textarea>
-                            <div class="invalid-feedback">Please enter your complete address.</div>
+                            <label class="form-label text-dark fw-semibold d-flex justify-content-between align-items-center mb-3">
+                                <span>Address <span class="text-danger">*</span></span>
+                                <button type="button" class="btn btn-sm btn-outline-success rounded-pill" id="btnAutoLocation">
+                                    <i class="bi bi-geo-alt-fill"></i> Automatic where you are now
+                                </button>
+                            </label>
+                            <div id="manualAddressFields" class="row g-3">
+                                <div class="col-md-6">
+                                    <select class="form-select bg-light border-0" id="region" name="region" required>
+                                        <option value="" disabled selected>Select Region</option>
+                                    </select>
+                                    <div class="invalid-feedback">Required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select bg-light border-0" id="province" name="province" required disabled>
+                                        <option value="" disabled selected>Select Province</option>
+                                    </select>
+                                    <div class="invalid-feedback">Required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select bg-light border-0" id="city" name="city" required disabled>
+                                        <option value="" disabled selected>Select City/Town</option>
+                                    </select>
+                                    <div class="invalid-feedback">Required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select bg-light border-0" id="barangay" name="barangay" required disabled>
+                                        <option value="" disabled selected>Select Barangay</option>
+                                    </select>
+                                    <div class="invalid-feedback">Required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control bg-light border-0" id="house_number" name="house_number" placeholder="House Number / Street" required>
+                                    <div class="invalid-feedback">Required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control bg-light border-0" id="zipcode" name="zipcode" placeholder="Zipcode" required>
+                                    <div class="invalid-feedback">Required.</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -97,25 +147,25 @@
                     <div class="row g-4 mb-4">
                         <!-- Username -->
                         <div class="col-12">
-                            <label for="username" class="form-label text-dark fw-semibold">Username</label>
+                            <label for="username" class="form-label text-dark fw-semibold">Username <span class="text-danger">*</span></label>
                             <input type="text" class="form-control bg-light border-0" id="username" name="username" placeholder="Choose a username" value="{{ form_data.username or '' }}" required>
                             <div class="invalid-feedback">Please choose a username.</div>
                         </div>
                         <!-- Password -->
                         <div class="col-md-6">
-                            <label for="password" class="form-label text-dark fw-semibold">Password</label>
+                            <label for="password" class="form-label text-dark fw-semibold">Password <span class="text-danger">*</span></label>
                             <input type="password" class="form-control bg-light border-0" id="password" name="password" placeholder="Create password" required>
                             <div class="invalid-feedback">Please enter a password.</div>
                         </div>
                         <!-- Confirm Password -->
                         <div class="col-md-6">
-                            <label for="confirm_password" class="form-label text-dark fw-semibold">Confirm Password</label>
+                            <label for="confirm_password" class="form-label text-dark fw-semibold">Confirm Password <span class="text-danger">*</span></label>
                             <input type="password" class="form-control bg-light border-0" id="confirm_password" name="confirm_password" placeholder="Verify password" required>
                             <div class="invalid-feedback">Please confirm your password.</div>
                         </div>
                         <!-- Security Answer -->
                         <div class="col-12">
-                            <label for="security_answer" class="form-label text-dark fw-semibold">Security Question: What was the name of your first school?</label>
+                            <label for="security_answer" class="form-label text-dark fw-semibold">Security Question: What was the name of your first school? <span class="text-danger">*</span></label>
                             <input type="text" class="form-control bg-light border-0" id="security_answer" name="security_answer" placeholder="Your answer (used for recovery)" required>
                             <div class="invalid-feedback">Please enter your security question answer.</div>
                         </div>
@@ -191,4 +241,5 @@
     </div>
   </div>
 </div>
+<script src="{{ url_for('static', filename='psgc.js') }}"></script>
 {% endblock %}

@@ -7346,3 +7346,286 @@ Params: (2, '2026-07-16', 2)
 2026-07-17 18:55:22,608 INFO: HTTP_RESPONSE: GET /notifications -> Status 200 OK
 2026-07-17 18:55:28,985 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
 2026-07-17 18:55:29,081 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-18 22:35:00,266 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-18 22:35:00,508 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-18 22:35:04,041 INFO: HTTP_REQUEST: GET /favicon.ico | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-18 22:35:04,049 INFO: HTTP_RESPONSE: GET /favicon.ico -> Status 404 NOT FOUND
+2026-07-20 18:10:38,120 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:10:38,283 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-20 18:10:38,652 INFO: HTTP_REQUEST: GET /favicon.ico | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:10:38,657 INFO: HTTP_RESPONSE: GET /favicon.ico -> Status 404 NOT FOUND
+2026-07-20 18:10:40,210 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:10:40,252 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-20 18:10:48,117 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:10:48,121 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jeric', 'jeric')
+2026-07-20 18:10:48,411 INFO: DB_SQL_SUCCESS: Query completed in 0.2904s
+2026-07-20 18:10:48,662 INFO: DB_SQL: executing: SELECT id, full_name, center_name, position, profile_photo, theme FROM teachers WHERE user_id = %s with params: (1,)
+2026-07-20 18:10:48,676 INFO: DB_SQL_SUCCESS: Query completed in 0.0134s
+2026-07-20 18:10:48,676 INFO: HTTP_RESPONSE: POST /login -> Status 302 FOUND
+2026-07-20 18:10:48,685 INFO: HTTP_REQUEST: GET /teacher/dashboard | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:10:48,686 INFO: DB_SQL: executing: SELECT c.*,             (SELECT COUNT(*) FROM classroom_learners cl WHERE cl.classroom_id = c.id) as learners_count            FROM classrooms c WHERE c.teacher_id = %s with params: (1,)
+2026-07-20 18:10:48,710 INFO: DB_SQL_SUCCESS: Query completed in 0.0249s
+2026-07-20 18:10:48,711 INFO: DB_SQL: executing: SELECT COUNT(*) as count FROM posts WHERE classroom_id IN (%s) with params: (1,)
+2026-07-20 18:10:48,715 INFO: DB_SQL_SUCCESS: Query completed in 0.0036s
+2026-07-20 18:10:48,793 INFO: HTTP_RESPONSE: GET /teacher/dashboard -> Status 200 OK
+2026-07-20 18:11:39,785 INFO: HTTP_REQUEST: GET /teacher/classrooms | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:11:39,786 INFO: DB_SQL: executing: SELECT c.*,             (SELECT COUNT(*) FROM classroom_learners cl WHERE cl.classroom_id = c.id) as learners_count            FROM classrooms c WHERE c.teacher_id = %s with params: (1,)
+2026-07-20 18:11:39,805 INFO: DB_SQL_SUCCESS: Query completed in 0.0189s
+2026-07-20 18:11:39,847 INFO: HTTP_RESPONSE: GET /teacher/classrooms -> Status 200 OK
+2026-07-20 18:11:41,851 INFO: HTTP_REQUEST: GET /teacher/classrooms/1 | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:11:41,852 INFO: DB_SQL: executing: SELECT * FROM classrooms WHERE id = %s AND teacher_id = %s with params: (1, 1)
+2026-07-20 18:11:41,856 INFO: DB_SQL_SUCCESS: Query completed in 0.0045s
+2026-07-20 18:11:41,857 INFO: DB_SQL: executing: SELECT * FROM posts WHERE classroom_id = %s ORDER BY is_pinned DESC, created_at DESC with params: (1,)
+2026-07-20 18:11:41,860 INFO: DB_SQL_SUCCESS: Query completed in 0.0035s
+2026-07-20 18:11:41,861 INFO: DB_SQL: executing: SELECT * FROM classwork WHERE classroom_id = %s ORDER BY created_at DESC with params: (1,)
+2026-07-20 18:11:41,865 INFO: DB_SQL_SUCCESS: Query completed in 0.0039s
+2026-07-20 18:11:41,865 INFO: DB_SQL: executing: SELECT l.*, p.parent_name, cl.id as enrollment_id FROM learners l            JOIN classroom_learners cl ON cl.learner_id = l.id            JOIN parents p ON l.parent_id = p.id            WHERE cl.classroom_id = %s with params: (1,)
+2026-07-20 18:11:41,890 INFO: DB_SQL_SUCCESS: Query completed in 0.0247s
+2026-07-20 18:11:41,890 INFO: DB_SQL: executing: SELECT l.* FROM learners l WHERE l.id NOT IN (%s) with params: (2,)
+2026-07-20 18:11:41,906 INFO: DB_SQL_SUCCESS: Query completed in 0.0156s
+2026-07-20 18:11:41,906 INFO: DB_SQL: executing: SELECT * FROM assessments WHERE learner_id IN (%s) with params: (2,)
+2026-07-20 18:11:41,910 INFO: DB_SQL_SUCCESS: Query completed in 0.0038s
+2026-07-20 18:11:41,910 INFO: DB_SQL: executing: SELECT * FROM classwork WHERE classroom_id = %s AND due_date >= CURDATE() ORDER BY due_date ASC LIMIT 5 with params: (1,)
+2026-07-20 18:11:41,938 INFO: DB_SQL_SUCCESS: Query completed in 0.0279s
+2026-07-20 18:11:41,938 INFO: DB_SQL: executing: SELECT cs.*, l.full_name, cw.title             FROM classwork_submissions cs             JOIN classwork cw ON cs.classwork_id = cw.id             JOIN learners l ON cs.learner_id = l.id             LEFT JOIN assessments a ON a.classwork_id = cs.classwork_id AND a.learner_id = cs.learner_id            WHERE cw.classroom_id = %s AND a.id IS NULL            ORDER BY cs.submitted_at DESC LIMIT 5 with params: (1,)
+2026-07-20 18:11:41,954 INFO: DB_SQL_SUCCESS: Query completed in 0.0156s
+2026-07-20 18:11:42,043 INFO: HTTP_RESPONSE: GET /teacher/classrooms/1 -> Status 200 OK
+2026-07-20 18:12:11,833 INFO: HTTP_REQUEST: GET /teacher/classrooms/create | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:12:11,892 INFO: HTTP_RESPONSE: GET /teacher/classrooms/create -> Status 200 OK
+2026-07-20 18:12:15,607 INFO: HTTP_REQUEST: GET /teacher/enrollment_requests | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:12:15,608 INFO: DB_SQL: executing: SELECT id, name FROM classrooms WHERE teacher_id = %s ORDER BY name ASC with params: (1,)
+2026-07-20 18:12:15,612 INFO: DB_SQL_SUCCESS: Query completed in 0.0040s
+2026-07-20 18:12:15,612 INFO: DB_SQL: executing: SELECT er.*, l.full_name as learner_name, p.parent_name, c.name as classroom_name                 FROM enrollment_requests er                JOIN learners l ON er.learner_id = l.id                JOIN parents p ON l.parent_id = p.id                JOIN classrooms c ON er.classroom_id = c.id                WHERE c.teacher_id = %s AND er.status = 'pending'                ORDER BY er.created_at DESC with params: (1,)
+2026-07-20 18:12:15,616 INFO: DB_SQL_SUCCESS: Query completed in 0.0043s
+2026-07-20 18:12:15,648 INFO: HTTP_RESPONSE: GET /teacher/enrollment_requests -> Status 200 OK
+2026-07-20 18:12:17,656 INFO: HTTP_REQUEST: GET /teacher/learners | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:12:17,657 INFO: DB_SQL: executing: SELECT id, name FROM classrooms WHERE teacher_id = %s with params: (1,)
+2026-07-20 18:12:17,660 INFO: DB_SQL_SUCCESS: Query completed in 0.0035s
+2026-07-20 18:12:17,661 INFO: DB_SQL: executing: SELECT l.*, p.parent_name,             c.name as classroom_name, c.id as classroom_id,            (SELECT status FROM bmi_records b WHERE b.learner_id = l.id ORDER BY b.recorded_date DESC LIMIT 1) as bmi_status,            (SELECT COUNT(*) FROM attendance a WHERE a.learner_id = l.id AND a.status = 'present') as present_count,            (SELECT COUNT(*) FROM attendance a WHERE a.learner_id = l.id) as attendance_total            FROM learners l            JOIN parents p ON l.parent_id = p.id            JOIN classroom_learners cl ON cl.learner_id = l.id            JOIN classrooms c ON cl.classroom_id = c.id            WHERE c.teacher_id = %s with params: (1,)
+2026-07-20 18:12:17,682 INFO: DB_SQL_SUCCESS: Query completed in 0.0212s
+2026-07-20 18:12:17,740 INFO: HTTP_RESPONSE: GET /teacher/learners -> Status 200 OK
+2026-07-20 18:12:17,806 INFO: HTTP_REQUEST: GET /static/uploads/certificates/birth_cert_LRN-12345678.jpeg | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:12:17,807 INFO: Serve Upload: certificates/birth_cert_LRN-12345678.jpeg from C:\Users\Windows 10 Pro\Documents\eccd\uploads\certificates/birth_cert_LRN-12345678.jpeg | Exists: True
+2026-07-20 18:12:17,972 INFO: HTTP_RESPONSE: GET /static/uploads/certificates/birth_cert_LRN-12345678.jpeg -> Status 200 OK
+2026-07-20 18:12:19,545 INFO: HTTP_REQUEST: GET /teacher/reports | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:12:19,546 INFO: DB_SQL: executing: SELECT * FROM classrooms WHERE teacher_id = %s ORDER BY name ASC with params: (1,)
+2026-07-20 18:12:19,550 INFO: DB_SQL_SUCCESS: Query completed in 0.0038s
+2026-07-20 18:12:19,633 INFO: HTTP_RESPONSE: GET /teacher/reports -> Status 200 OK
+2026-07-20 18:12:21,393 INFO: HTTP_REQUEST: GET /teacher/analytics | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:12:21,395 INFO: DB_SQL: executing: SELECT * FROM classrooms WHERE teacher_id = %s with params: (1,)
+2026-07-20 18:12:21,413 INFO: DB_SQL_SUCCESS: Query completed in 0.0177s
+2026-07-20 18:12:21,413 INFO: DB_SQL: executing: SELECT l.*, p.parent_name, cl.classroom_id, c.name as classroom_name                 FROM learners l                JOIN parents p ON l.parent_id = p.id                JOIN classroom_learners cl ON cl.learner_id = l.id                JOIN classrooms c ON cl.classroom_id = c.id                WHERE cl.classroom_id IN (%s) with params: (1,)
+2026-07-20 18:12:21,429 INFO: DB_SQL_SUCCESS: Query completed in 0.0162s
+2026-07-20 18:12:21,430 INFO: DB_SQL: executing: SELECT classroom_id,                 COUNT(CASE WHEN status = 'present' THEN 1 END) as present_count,                 COUNT(*) as total_count                 FROM attendance WHERE classroom_id IN (%s)                GROUP BY classroom_id with params: (1,)
+2026-07-20 18:12:21,446 INFO: DB_SQL_SUCCESS: Query completed in 0.0159s
+2026-07-20 18:12:21,446 INFO: DB_SQL: executing: SELECT cw.classroom_id, AVG(a.score) as avg_score                 FROM assessments a                 JOIN classwork cw ON a.classwork_id = cw.id                 WHERE cw.classroom_id IN (%s)                GROUP BY cw.classroom_id with params: (1,)
+2026-07-20 18:12:21,450 INFO: DB_SQL_SUCCESS: Query completed in 0.0037s
+2026-07-20 18:12:21,450 INFO: DB_SQL: executing: SELECT learner_id,                 COUNT(CASE WHEN status = 'present' THEN 1 END) as present_count,                 COUNT(*) as total_count                 FROM attendance                 WHERE classroom_id IN (%s)                GROUP BY learner_id with params: (1,)
+2026-07-20 18:12:21,462 INFO: DB_SQL_SUCCESS: Query completed in 0.0119s
+2026-07-20 18:12:21,462 INFO: DB_SQL: executing: SELECT b.* FROM bmi_records b                JOIN (                    SELECT learner_id, MAX(recorded_date) as max_date                     FROM bmi_records GROUP BY learner_id                ) latest ON b.learner_id = latest.learner_id AND b.recorded_date = latest.max_date                WHERE b.learner_id IN (                    SELECT learner_id FROM classroom_learners WHERE classroom_id IN (%s)                ) with params: (1,)
+2026-07-20 18:12:21,482 INFO: DB_SQL_SUCCESS: Query completed in 0.0196s
+2026-07-20 18:12:21,482 INFO: DB_SQL: executing: SELECT learner_id, AVG(score) as avg_score                 FROM assessments GROUP BY learner_id with params: ()
+2026-07-20 18:12:21,485 INFO: DB_SQL_SUCCESS: Query completed in 0.0028s
+2026-07-20 18:12:21,533 INFO: HTTP_RESPONSE: GET /teacher/analytics -> Status 200 OK
+2026-07-20 18:13:08,849 INFO: HTTP_REQUEST: GET /teacher/announcements | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:13:08,850 INFO: DB_SQL: executing: SELECT * FROM announcements WHERE teacher_id = %s ORDER BY created_at DESC with params: (1,)
+2026-07-20 18:13:08,854 INFO: DB_SQL_SUCCESS: Query completed in 0.0046s
+2026-07-20 18:13:08,879 INFO: HTTP_RESPONSE: GET /teacher/announcements -> Status 200 OK
+2026-07-20 18:13:46,321 INFO: HTTP_REQUEST: GET /logout | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:13:46,322 INFO: HTTP_RESPONSE: GET /logout -> Status 302 FOUND
+2026-07-20 18:13:46,334 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:13:46,335 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-20 18:13:48,082 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:13:48,083 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-20 18:13:53,636 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:13:53,637 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jasmina', 'jasmina')
+2026-07-20 18:13:53,650 INFO: DB_SQL_SUCCESS: Query completed in 0.0129s
+2026-07-20 18:13:53,651 INFO: HTTP_RESPONSE: POST /login -> Status 200 OK
+2026-07-20 18:14:00,992 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:14:00,992 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jasmine', 'jasmine')
+2026-07-20 18:14:01,012 INFO: DB_SQL_SUCCESS: Query completed in 0.0194s
+2026-07-20 18:14:01,286 INFO: DB_SQL: executing: SELECT id, parent_name, mobile, address, theme FROM parents WHERE user_id = %s with params: (3,)
+2026-07-20 18:14:01,309 INFO: DB_SQL_SUCCESS: Query completed in 0.0232s
+2026-07-20 18:14:01,310 INFO: DB_SQL: executing: SELECT id, learner_id, full_name, center_name, photo, gender, birthdate FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-20 18:14:01,313 INFO: DB_SQL_SUCCESS: Query completed in 0.0031s
+2026-07-20 18:14:01,313 INFO: HTTP_RESPONSE: POST /login -> Status 302 FOUND
+2026-07-20 18:14:01,321 INFO: HTTP_REQUEST: GET /parent/dashboard | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:14:01,321 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-20 18:14:01,325 INFO: DB_SQL_SUCCESS: Query completed in 0.0040s
+2026-07-20 18:14:01,326 INFO: DB_SQL: executing: SELECT COUNT(*) as count FROM classroom_learners WHERE learner_id = %s with params: (2,)
+2026-07-20 18:14:01,343 INFO: DB_SQL_SUCCESS: Query completed in 0.0171s
+2026-07-20 18:14:01,343 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC LIMIT 1 with params: (2,)
+2026-07-20 18:14:01,358 INFO: DB_SQL_SUCCESS: Query completed in 0.0144s
+2026-07-20 18:14:01,367 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-20 18:14:01,392 INFO: DB_SQL_SUCCESS: Query completed in 0.0246s
+2026-07-20 18:14:01,392 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-20 18:14:01,408 INFO: DB_SQL_SUCCESS: Query completed in 0.0159s
+2026-07-20 18:14:01,409 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-21', 2)
+2026-07-20 18:14:01,413 INFO: DB_SQL_SUCCESS: Query completed in 0.0041s
+2026-07-20 18:14:01,413 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-20 18:14:01,428 INFO: DB_SQL_SUCCESS: Query completed in 0.0152s
+2026-07-20 18:14:01,430 INFO: HTTP_RESPONSE: GET /parent/dashboard -> Status 200 OK
+2026-07-20 18:14:13,761 INFO: HTTP_REQUEST: GET /parent/child | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+2026-07-20 18:14:13,761 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (2,)
+2026-07-20 18:14:13,780 INFO: DB_SQL_SUCCESS: Query completed in 0.0184s
+2026-07-20 18:14:13,780 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC with params: (2,)
+2026-07-20 18:14:13,797 INFO: DB_SQL_SUCCESS: Query completed in 0.0170s
+2026-07-20 18:14:13,797 INFO: DB_SQL: executing: SELECT * FROM attendance WHERE learner_id = %s ORDER BY date DESC LIMIT 15 with params: (2,)
+2026-07-20 18:14:13,813 INFO: DB_SQL_SUCCESS: Query completed in 0.0156s
+2026-07-20 18:14:13,813 INFO: DB_SQL: executing: SELECT a.*, cw.title, cw.subject_folder FROM assessments a            JOIN classwork cw ON a.classwork_id = cw.id            WHERE a.learner_id = %s            ORDER BY a.graded_at DESC with params: (2,)
+2026-07-20 18:14:13,830 INFO: DB_SQL_SUCCESS: Query completed in 0.0165s
+2026-07-20 18:14:13,876 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (3,)
+2026-07-20 18:14:13,881 INFO: DB_SQL_SUCCESS: Query completed in 0.0047s
+2026-07-20 18:14:13,881 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (2,)
+2026-07-20 18:14:13,896 INFO: DB_SQL_SUCCESS: Query completed in 0.0153s
+2026-07-20 18:14:13,897 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (2, '2026-07-21', 2)
+2026-07-20 18:14:13,913 INFO: DB_SQL_SUCCESS: Query completed in 0.0163s
+2026-07-20 18:14:13,913 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (3,)
+2026-07-20 18:14:13,930 INFO: DB_SQL_SUCCESS: Query completed in 0.0163s
+2026-07-20 18:14:13,932 INFO: HTTP_RESPONSE: GET /parent/child -> Status 200 OK
+2026-07-22 15:37:42,000 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:37:42,248 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-22 15:38:14,658 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:38:14,682 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-22 15:38:31,993 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:38:32,049 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 15:39:55,680 INFO: HTTP_REQUEST: POST /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:39:55,685 INFO: DB_SQL: executing: SELECT id FROM users WHERE username = %s OR email = %s with params: ('jenrie', 'jasmine.araza1@gmail.com')
+2026-07-22 15:39:55,815 INFO: DB_SQL_SUCCESS: Query completed in 0.1297s
+2026-07-22 15:39:55,819 INFO: HTTP_RESPONSE: POST /register/parent -> Status 200 OK
+2026-07-22 15:40:18,061 INFO: HTTP_REQUEST: POST /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:40:18,066 INFO: DB_SQL: executing: SELECT id FROM users WHERE username = %s OR email = %s with params: ('jenrie', 'jasmine.araza123@gmail.com')
+2026-07-22 15:40:18,076 INFO: DB_SQL_SUCCESS: Query completed in 0.0097s
+2026-07-22 15:40:18,078 INFO: HTTP_RESPONSE: POST /register/parent -> Status 200 OK
+2026-07-22 15:40:41,373 INFO: HTTP_REQUEST: POST /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:40:41,379 INFO: DB_SQL: executing: SELECT id FROM users WHERE username = %s OR email = %s with params: ('jenrie1', 'jasmine.araza123@gmail.com')
+2026-07-22 15:40:41,403 INFO: DB_SQL_SUCCESS: Query completed in 0.0237s
+2026-07-22 15:40:41,404 INFO: DB_SQL: executing: SELECT id FROM learners WHERE learner_id = %s with params: ('LRN-12345678',)
+2026-07-22 15:40:41,427 INFO: DB_SQL_SUCCESS: Query completed in 0.0231s
+2026-07-22 15:40:41,431 INFO: HTTP_RESPONSE: POST /register/parent -> Status 200 OK
+2026-07-22 15:41:04,877 INFO: HTTP_REQUEST: POST /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:41:04,884 INFO: DB_SQL: executing: SELECT id FROM users WHERE username = %s OR email = %s with params: ('jenrie1', 'jasmine.araza123@gmail.com')
+2026-07-22 15:41:04,893 INFO: DB_SQL_SUCCESS: Query completed in 0.0098s
+2026-07-22 15:41:04,895 INFO: DB_SQL: executing: SELECT id FROM learners WHERE learner_id = %s with params: ('LRN-12345678910',)
+2026-07-22 15:41:04,906 INFO: DB_SQL_SUCCESS: Query completed in 0.0113s
+2026-07-22 15:41:05,306 INFO: DB_SQL: executing: INSERT INTO users (username, password, email, role) VALUES (%s, %s, %s, %s) with params: ('jenrie1', 'scrypt:32768:8:1$veKffY11ckewb7BU$fc7dd611efebbc0907658186ee32888819ef2db3599ff0160807d4384cb94fb6e32ad9999aeff5e307e1471a0ac41bf579d4c15c164a2f64a6d51ecc1e8fc905', 'jasmine.araza123@gmail.com', 'parent')
+2026-07-22 15:41:05,335 INFO: DB_SQL_SUCCESS: Query completed in 0.0283s
+2026-07-22 15:41:05,335 INFO: DB_SQL: executing: INSERT INTO parents (user_id, parent_name, mobile, address) VALUES (%s, %s, %s, %s) with params: (4, 'Jasmine', '0924567898', 'paete')
+2026-07-22 15:41:05,364 INFO: DB_SQL_SUCCESS: Query completed in 0.0282s
+2026-07-22 15:41:05,364 INFO: DB_SQL: executing: INSERT INTO learners (parent_id, learner_id, full_name, relationship, center_name, photo, gender, birthdate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) with params: (3, 'LRN-12345678910', 'Jenrie', 'Father', 'Kinder', None, 'Male', '2015-01-05')
+2026-07-22 15:41:05,398 INFO: DB_SQL_SUCCESS: Query completed in 0.0334s
+2026-07-22 15:41:05,399 INFO: HTTP_RESPONSE: POST /register/parent -> Status 302 FOUND
+2026-07-22 15:41:05,413 INFO: HTTP_REQUEST: GET /login | Args: {'role': 'parent'} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:41:05,416 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-22 15:41:10,560 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:41:10,562 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-22 15:41:46,911 INFO: HTTP_REQUEST: POST /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:41:46,914 INFO: DB_SQL: executing: SELECT * FROM users WHERE (username = %s OR email = %s) with params: ('jenrie1', 'jenrie1')
+2026-07-22 15:41:46,936 INFO: DB_SQL_SUCCESS: Query completed in 0.0224s
+2026-07-22 15:41:47,290 INFO: DB_SQL: executing: SELECT id, parent_name, mobile, address, theme FROM parents WHERE user_id = %s with params: (4,)
+2026-07-22 15:41:47,306 INFO: DB_SQL_SUCCESS: Query completed in 0.0161s
+2026-07-22 15:41:47,306 INFO: DB_SQL: executing: SELECT id, learner_id, full_name, center_name, photo, gender, birthdate FROM learners WHERE parent_id = %s with params: (3,)
+2026-07-22 15:41:47,329 INFO: DB_SQL_SUCCESS: Query completed in 0.0224s
+2026-07-22 15:41:47,330 INFO: HTTP_RESPONSE: POST /login -> Status 302 FOUND
+2026-07-22 15:41:47,344 INFO: HTTP_REQUEST: GET /parent/dashboard | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:41:47,345 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (3,)
+2026-07-22 15:41:47,365 INFO: DB_SQL_SUCCESS: Query completed in 0.0202s
+2026-07-22 15:41:47,365 INFO: DB_SQL: executing: SELECT COUNT(*) as count FROM classroom_learners WHERE learner_id = %s with params: (3,)
+2026-07-22 15:41:47,377 INFO: DB_SQL_SUCCESS: Query completed in 0.0121s
+2026-07-22 15:41:47,378 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC LIMIT 1 with params: (3,)
+2026-07-22 15:41:47,401 INFO: DB_SQL_SUCCESS: Query completed in 0.0234s
+2026-07-22 15:41:47,417 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (4,)
+2026-07-22 15:41:47,434 INFO: DB_SQL_SUCCESS: Query completed in 0.0170s
+2026-07-22 15:41:47,435 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (3,)
+2026-07-22 15:41:47,443 INFO: DB_SQL_SUCCESS: Query completed in 0.0076s
+2026-07-22 15:41:47,443 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (3, '2026-07-23', 3)
+2026-07-22 15:41:47,469 INFO: DB_SQL_SUCCESS: Query completed in 0.0261s
+2026-07-22 15:41:47,470 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (4,)
+2026-07-22 15:41:47,495 INFO: DB_SQL_SUCCESS: Query completed in 0.0246s
+2026-07-22 15:41:47,530 INFO: HTTP_RESPONSE: GET /parent/dashboard -> Status 200 OK
+2026-07-22 15:41:54,759 INFO: HTTP_REQUEST: GET /parent/child | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:41:54,760 INFO: DB_SQL: executing: SELECT c.*, t.full_name as teacher_name FROM classrooms c            JOIN classroom_learners cl ON cl.classroom_id = c.id            JOIN teachers t ON c.teacher_id = t.id            WHERE cl.learner_id = %s with params: (3,)
+2026-07-22 15:41:54,770 INFO: DB_SQL_SUCCESS: Query completed in 0.0103s
+2026-07-22 15:41:54,771 INFO: DB_SQL: executing: SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC with params: (3,)
+2026-07-22 15:41:54,782 INFO: DB_SQL_SUCCESS: Query completed in 0.0110s
+2026-07-22 15:41:54,784 INFO: DB_SQL: executing: SELECT * FROM attendance WHERE learner_id = %s ORDER BY date DESC LIMIT 15 with params: (3,)
+2026-07-22 15:41:54,814 INFO: DB_SQL_SUCCESS: Query completed in 0.0300s
+2026-07-22 15:41:54,815 INFO: DB_SQL: executing: SELECT a.*, cw.title, cw.subject_folder FROM assessments a            JOIN classwork cw ON a.classwork_id = cw.id            WHERE a.learner_id = %s            ORDER BY a.graded_at DESC with params: (3,)
+2026-07-22 15:41:54,843 INFO: DB_SQL_SUCCESS: Query completed in 0.0284s
+2026-07-22 15:41:54,886 INFO: DB_SQL: executing: SELECT id FROM parents WHERE user_id = %s with params: (4,)
+2026-07-22 15:41:54,906 INFO: DB_SQL_SUCCESS: Query completed in 0.0191s
+2026-07-22 15:41:54,906 INFO: DB_SQL: executing: SELECT id FROM learners WHERE parent_id = %s with params: (3,)
+2026-07-22 15:41:54,914 INFO: DB_SQL_SUCCESS: Query completed in 0.0078s
+2026-07-22 15:41:54,915 INFO: DB_SQL: executing: SELECT cw.id, cw.title FROM classwork cw                        JOIN classroom_learners cl ON cw.classroom_id = cl.classroom_id                        WHERE cl.learner_id = %s AND cw.due_date = %s                        AND cw.id NOT IN (SELECT classwork_id FROM classwork_submissions WHERE learner_id = %s) with params: (3, '2026-07-23', 3)
+2026-07-22 15:41:54,938 INFO: DB_SQL_SUCCESS: Query completed in 0.0239s
+2026-07-22 15:41:54,939 INFO: DB_SQL: executing: SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC with params: (4,)
+2026-07-22 15:41:54,947 INFO: DB_SQL_SUCCESS: Query completed in 0.0081s
+2026-07-22 15:41:54,949 INFO: HTTP_RESPONSE: GET /parent/child -> Status 200 OK
+2026-07-22 15:43:19,620 INFO: HTTP_REQUEST: GET /logout | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:43:19,623 INFO: HTTP_RESPONSE: GET /logout -> Status 302 FOUND
+2026-07-22 15:43:19,657 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:43:19,665 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-22 15:43:23,123 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:43:23,132 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-22 15:43:26,695 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:43:26,701 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 15:43:36,872 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:43:36,950 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 15:47:44,201 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:47:44,207 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-22 15:48:01,370 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:48:01,375 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-22 15:52:21,512 INFO: HTTP_REQUEST: GET / | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:52:21,518 INFO: HTTP_RESPONSE: GET / -> Status 200 OK
+2026-07-22 15:52:49,276 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:52:49,362 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 15:52:49,415 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:52:49,605 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 200 OK
+2026-07-22 15:53:11,880 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:53:11,885 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 15:53:11,953 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:53:11,963 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 15:55:50,236 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:55:50,243 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 15:55:50,311 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:55:50,317 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 200 OK
+2026-07-22 15:58:02,499 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:58:02,562 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 15:58:02,625 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:58:02,631 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 200 OK
+2026-07-22 15:59:01,233 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:59:01,269 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 15:59:01,312 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 15:59:01,317 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:00:00,213 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:00:00,217 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 16:00:00,277 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:00:00,283 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 200 OK
+2026-07-22 16:00:12,945 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:00:12,951 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 16:00:13,028 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:00:13,042 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:00:21,269 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:00:21,275 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 16:00:21,347 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:00:21,354 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:01:11,359 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:01:11,428 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 16:01:11,502 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:01:11,507 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:02:20,392 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:02:20,444 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 16:02:20,501 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:02:20,513 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:03:40,843 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:03:40,847 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 16:03:40,914 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:03:40,922 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 200 OK
+2026-07-22 16:04:03,892 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:04:03,897 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 16:04:03,966 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:04:03,989 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:04:23,956 INFO: HTTP_REQUEST: GET /register/teacher | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:04:23,961 INFO: HTTP_RESPONSE: GET /register/teacher -> Status 200 OK
+2026-07-22 16:04:24,043 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:04:24,056 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
