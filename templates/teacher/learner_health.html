@@ -62,6 +62,28 @@
 </div>
 
 <div class="row">
+    <!-- 2. PREDICTIVE BMI GRAPH -->
+    {% if bmi_records and bmi_records|length >= 2 %}
+    <div class="col-12 mb-4">
+        <div class="card p-3 border border-light-subtle bg-white shadow-sm">
+            <h6 class="fw-bold mb-3 text-dark border-bottom pb-2"><i class="bi bi-graph-up text-primary me-1"></i>BMI Growth Trend & 1-Month Prediction</h6>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <canvas id="bmiPredictionChart" height="100"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <div class="alert alert-info border-0 rounded-4 p-3 shadow-sm" role="alert">
+                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-info-circle-fill me-1"></i>Prediction Info</h6>
+                        <p class="mb-2 small text-secondary">Based on the historical growth data, here is the projected BMI next month:</p>
+                        <h4 id="predictedBmiValue" class="fw-bold mb-1">-</h4>
+                        <span id="predictedBmiLabel" class="badge bg-secondary">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- 3. BMI HISTORY -->
     <div class="col-md-6 mb-4">
         <div class="card p-3 border border-light-subtle bg-white">
@@ -98,6 +120,16 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- 4. ACTION PLAN -->
+    {% if bmi_records and bmi_records|length >= 2 %}
+    <div class="col-md-6 mb-4">
+        <div class="card p-3 border border-light-subtle bg-white h-100 shadow-sm">
+            <h6 class="fw-bold mb-3 text-dark border-bottom pb-2"><i class="bi bi-shield-check text-primary me-1"></i>Recommended Action Plan</h6>
+            <div id="predictedBmiAction" class="p-3 bg-light rounded border-start border-4 border-primary text-dark d-none fs-6" style="line-height: 1.6;"></div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <script>
@@ -123,5 +155,150 @@ document.addEventListener("DOMContentLoaded", function() {
       }, false)
     })
 })()
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    {% if bmi_records and bmi_records|length >= 2 %}
+    document.addEventListener("DOMContentLoaded", function() {
+        // Parse BMI records from Jinja (they are ordered DESC by date in backend)
+        // We need them ascending for the chart
+        const records = [
+            {% for rec in bmi_records %}
+                { date: '{{ rec.recorded_date }}', bmi: {{ rec.bmi }} }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ].reverse(); // reverse to get oldest first
+        
+        // Prepare data for regression
+        // Use days since first record as X
+        const firstDate = new Date(records[0].date).getTime();
+        const MS_PER_DAY = 1000 * 60 * 60 * 24;
+        
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        const n = records.length;
+        
+        const dataPoints = records.map(r => {
+            const days = (new Date(r.date).getTime() - firstDate) / MS_PER_DAY;
+            sumX += days;
+            sumY += r.bmi;
+            sumXY += (days * r.bmi);
+            sumX2 += (days * days);
+            return { x: days, y: r.bmi, dateStr: r.date };
+        });
+        
+        // Linear regression formula: y = mx + b
+        const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const b = (sumY - m * sumX) / n;
+        
+        // Predict 1 month (approx 30 days) from the LAST record
+        const lastRecord = dataPoints[n - 1];
+        const predictedDays = lastRecord.x + 30;
+        const predictedBMI = (m * predictedDays) + b;
+        
+        // Format predicted date
+        const predictedDateObj = new Date(new Date(lastRecord.dateStr).getTime() + (30 * MS_PER_DAY));
+        const predictedDateStr = predictedDateObj.toISOString().split('T')[0];
+        
+        // Chart datasets
+        const labels = records.map(r => r.date);
+        labels.push(predictedDateStr + " (Predicted)");
+        
+        const historicalData = records.map(r => r.bmi);
+        historicalData.push(null); // null for predicted point to break the solid line
+        
+        const trendData = new Array(n).fill(null);
+        trendData[n-1] = lastRecord.y; // start dotted line from last known point
+        trendData.push(predictedBMI);
+        
+        const ctx = document.getElementById('bmiPredictionChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Historical BMI',
+                        data: historicalData,
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true,
+                        pointBackgroundColor: '#198754'
+                    },
+                    {
+                        label: 'Predicted BMI (1 Month)',
+                        data: trendData,
+                        borderColor: '#0dcaf0',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0,
+                        pointBackgroundColor: '#0dcaf0',
+                        pointStyle: 'rectRot',
+                        pointRadius: 5
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: { display: true, text: 'BMI Value' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Date' }
+                    }
+                }
+            }
+        });
+        
+        // Update Prediction Info Box
+        const finalBmi = predictedBMI.toFixed(2);
+        document.getElementById('predictedBmiValue').innerText = finalBmi;
+        
+        let status = '';
+        let badgeClass = '';
+        let actionPlan = '';
+        if (predictedBMI < 18.5) {
+            status = 'Underweight';
+            badgeClass = 'bg-warning text-dark';
+            actionPlan = '<strong>Action Plan:</strong> The trend suggests risk of being underweight. Consider increasing caloric intake with nutrient-dense foods (e.g., proteins, healthy fats, dairy) and consult a pediatrician or nutritionist for a structured meal plan.';
+        } else if (predictedBMI < 25.0) {
+            status = 'Normal';
+            badgeClass = 'bg-success';
+            actionPlan = '<strong>Action Plan:</strong> Great trajectory! Maintain current balanced diet and encourage regular physical activities to keep the child in the healthy range.';
+        } else if (predictedBMI < 30.0) {
+            status = 'Overweight';
+            badgeClass = 'bg-danger';
+            actionPlan = '<strong>Action Plan:</strong> The trend points towards overweight. Encourage more active playtime, limit sugary snacks/drinks, and focus on portions of fruits and vegetables. Avoid restrictive diets without consulting a doctor.';
+        } else {
+            status = 'Obese';
+            badgeClass = 'bg-danger';
+            actionPlan = '<strong>Action Plan:</strong> The trend indicates obesity risk. Please consult a pediatrician for proper guidance. Focus on active lifestyles, structured family meals, and replacing processed foods with whole foods.';
+        }
+        
+        const labelEl = document.getElementById('predictedBmiLabel');
+        labelEl.innerText = status;
+        labelEl.className = 'badge ' + badgeClass;
+        
+        const actionEl = document.getElementById('predictedBmiAction');
+        if (actionEl) {
+            actionEl.innerHTML = actionPlan;
+            actionEl.classList.remove('d-none');
+        }
+    });
+    {% endif %}
 </script>
 {% endblock %}

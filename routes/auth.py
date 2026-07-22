@@ -195,7 +195,12 @@ def register_parent():
         confirm_password = request.form.get('confirm_password')
         
         # Child fields
-        learner_full_name = request.form.get('learner_full_name')
+        child_first_name = request.form.get('child_first_name', '')
+        child_middle_name = request.form.get('child_middle_name', '')
+        child_last_name = request.form.get('child_last_name', '')
+        child_extension = request.form.get('child_extension', '')
+        learner_full_name = f"{child_first_name} {child_middle_name} {child_last_name} {child_extension}".strip().replace('  ', ' ')
+        
         learner_id = request.form.get('learner_id')
         center_name = request.form.get('center_name')
         gender = request.form.get('gender')
@@ -205,7 +210,9 @@ def register_parent():
             'first_name': first_name, 'middle_name': middle_name, 'last_name': last_name, 'extension': extension,
             'email': email, 'mobile': mobile,
             'relationship': relationship, 'address': address, 'username': username,
-            'learner_full_name': learner_full_name, 'learner_id': learner_id, 'center_name': center_name,
+            'child_first_name': child_first_name, 'child_middle_name': child_middle_name, 
+            'child_last_name': child_last_name, 'child_extension': child_extension,
+            'learner_id': learner_id, 'center_name': center_name,
             'gender': gender, 'birthdate': birthdate
         }
         

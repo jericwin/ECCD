@@ -110,11 +110,32 @@
         <div class="tab-pane fade show active" id="nav-bmi" role="tabpanel" aria-labelledby="nav-bmi-tab">
             <h5 class="fw-bold mb-3 text-dark">Weight and Height logs</h5>
             {% if bmi_records %}
+                {% if bmi_records|length >= 2 %}
+                <div class="card p-3 border border-light-subtle bg-light shadow-sm mb-4">
+                    <h6 class="fw-bold mb-3 text-dark border-bottom pb-2"><i class="bi bi-graph-up text-primary me-1"></i>BMI Growth Trend & 1-Month Prediction</h6>
+                    <div class="row align-items-center">
+                        <div class="col-md-8" style="height: 250px;">
+                            <canvas id="bmiPredictionChart"></canvas>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-info border-0 rounded-4 p-3 shadow-sm" role="alert">
+                                <h6 class="fw-bold text-primary mb-2"><i class="bi bi-info-circle-fill me-1"></i>Prediction Info</h6>
+                                <p class="mb-2 small text-secondary">Based on historical growth, projected BMI next month:</p>
+                                <h4 id="predictedBmiValue" class="fw-bold mb-1">-</h4>
+                                <span id="predictedBmiLabel" class="badge bg-secondary">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
                 <div class="mb-4" style="height: 300px;">
                     <canvas id="bmiChart"></canvas>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
+                {% endif %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
                         <thead>
                             <tr class="table-light">
                                 <th>Date Recorded</th>
@@ -140,6 +161,17 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                        </div>
+                    </div>
+                    <!-- ACTION PLAN COLUMN -->
+                    <div class="col-md-4">
+                        {% if bmi_records and bmi_records|length >= 2 %}
+                        <div class="card p-3 border border-light-subtle bg-white h-100 shadow-sm">
+                            <h6 class="fw-bold mb-3 text-dark border-bottom pb-2"><i class="bi bi-shield-check text-primary me-1"></i>Recommended Action Plan</h6>
+                            <div id="predictedBmiAction" class="p-3 bg-light rounded border-start border-4 border-primary text-dark d-none fs-6" style="line-height: 1.6;"></div>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             {% else %}
                 <div class="text-center py-4 bg-light rounded">
@@ -233,35 +265,136 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // BMI Chart
+        // BMI Chart & Prediction
         {% if bmi_records %}
-        const bmiData = [
-            {% for r in bmi_records | reverse %}
-            { date: '{{ r.recorded_date }}', bmi: {{ r.bmi }} },
-            {% endfor %}
-        ];
-        
-        const bmiCtx = document.getElementById('bmiChart').getContext('2d');
-        new Chart(bmiCtx, {
-            type: 'line',
-            data: {
-                labels: bmiData.map(d => d.date),
-                datasets: [{
-                    label: 'BMI Trend',
-                    data: bmiData.map(d => d.bmi),
-                    borderColor: '#198754',
-                    backgroundColor: 'rgba(25, 135, 84, 0.2)',
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: false }
+            {% if bmi_records|length >= 2 %}
+            // Predictive Chart
+            const records = [
+                {% for r in bmi_records %}
+                { date: '{{ r.recorded_date }}', bmi: {{ r.bmi }} }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ].reverse();
+            
+            const firstDate = new Date(records[0].date).getTime();
+            const MS_PER_DAY = 1000 * 60 * 60 * 24;
+            
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            const n = records.length;
+            
+            const dataPoints = records.map(r => {
+                const days = (new Date(r.date).getTime() - firstDate) / MS_PER_DAY;
+                sumX += days; sumY += r.bmi; sumXY += (days * r.bmi); sumX2 += (days * days);
+                return { x: days, y: r.bmi, dateStr: r.date };
+            });
+            
+            const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const b = (sumY - m * sumX) / n;
+            
+            const lastRecord = dataPoints[n - 1];
+            const predictedDays = lastRecord.x + 30;
+            const predictedBMI = (m * predictedDays) + b;
+            
+            const predictedDateObj = new Date(new Date(lastRecord.dateStr).getTime() + (30 * MS_PER_DAY));
+            const predictedDateStr = predictedDateObj.toISOString().split('T')[0];
+            
+            const labels = records.map(r => r.date);
+            labels.push(predictedDateStr + " (Predicted)");
+            
+            const historicalData = records.map(r => r.bmi);
+            historicalData.push(null);
+            
+            const trendData = new Array(n).fill(null);
+            trendData[n-1] = lastRecord.y;
+            trendData.push(predictedBMI);
+            
+            const bmiCtx = document.getElementById('bmiPredictionChart').getContext('2d');
+            new Chart(bmiCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Historical BMI',
+                            data: historicalData,
+                            borderColor: '#198754',
+                            backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            fill: true,
+                            pointBackgroundColor: '#198754'
+                        },
+                        {
+                            label: 'Predicted BMI (1 Month)',
+                            data: trendData,
+                            borderColor: '#0dcaf0',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0,
+                            pointBackgroundColor: '#0dcaf0',
+                            pointStyle: 'rectRot',
+                            pointRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: false } }
                 }
+            });
+            
+            const finalBmi = predictedBMI.toFixed(2);
+            document.getElementById('predictedBmiValue').innerText = finalBmi;
+            
+            let status = '';
+            let badgeClass = '';
+            let actionPlan = '';
+            if (predictedBMI < 18.5) { 
+                status = 'Underweight'; badgeClass = 'bg-warning text-dark'; 
+                actionPlan = '<strong>Action Plan:</strong> The trend suggests risk of being underweight. Consider increasing caloric intake with nutrient-dense foods (e.g., proteins, healthy fats, dairy) and consult a pediatrician or nutritionist for a structured meal plan.';
+            } else if (predictedBMI < 25.0) { 
+                status = 'Normal'; badgeClass = 'bg-success'; 
+                actionPlan = '<strong>Action Plan:</strong> Great trajectory! Maintain current balanced diet and encourage regular physical activities to keep the child in the healthy range.';
+            } else if (predictedBMI < 30.0) { 
+                status = 'Overweight'; badgeClass = 'bg-danger'; 
+                actionPlan = '<strong>Action Plan:</strong> The trend points towards overweight. Encourage more active playtime, limit sugary snacks/drinks, and focus on portions of fruits and vegetables. Avoid restrictive diets without consulting a doctor.';
+            } else { 
+                status = 'Obese'; badgeClass = 'bg-danger'; 
+                actionPlan = '<strong>Action Plan:</strong> The trend indicates obesity risk. Please consult a pediatrician for proper guidance. Focus on active lifestyles, structured family meals, and replacing processed foods with whole foods.';
             }
-        });
+            
+            const labelEl = document.getElementById('predictedBmiLabel');
+            labelEl.innerText = status; labelEl.className = 'badge ' + badgeClass;
+            
+            const actionEl = document.getElementById('predictedBmiAction');
+            if (actionEl) {
+                actionEl.innerHTML = actionPlan;
+                actionEl.classList.remove('d-none');
+            }
+            
+            {% else %}
+            // Fallback Simple Chart for 1 record
+            const bmiData = [
+                {% for r in bmi_records | reverse %}
+                { date: '{{ r.recorded_date }}', bmi: {{ r.bmi }} },
+                {% endfor %}
+            ];
+            const bmiCtx = document.getElementById('bmiChart').getContext('2d');
+            new Chart(bmiCtx, {
+                type: 'line',
+                data: {
+                    labels: bmiData.map(d => d.date),
+                    datasets: [{
+                        label: 'BMI Trend',
+                        data: bmiData.map(d => d.bmi),
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false } } }
+            });
+            {% endif %}
         {% endif %}
 
         // Attendance Chart
