@@ -7811,3 +7811,19 @@ Params: (2, '2026-07-16', 2)
 2026-07-22 16:25:02,668 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
 2026-07-22 16:25:02,727 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
 2026-07-22 16:25:02,736 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:27:41,612 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:27:41,693 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 16:27:41,730 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:27:41,912 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:28:00,742 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:28:00,748 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 16:28:00,813 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:28:00,818 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:29:34,198 INFO: HTTP_REQUEST: GET /register/parent | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:29:34,272 INFO: HTTP_RESPONSE: GET /register/parent -> Status 200 OK
+2026-07-22 16:29:34,339 INFO: HTTP_REQUEST: GET /static/psgc.js | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:29:34,348 INFO: HTTP_RESPONSE: GET /static/psgc.js -> Status 304 NOT MODIFIED
+2026-07-22 16:29:45,085 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:29:45,100 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
+2026-07-22 16:29:47,312 INFO: HTTP_REQUEST: GET /login | Args: {} | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0
+2026-07-22 16:29:47,318 INFO: HTTP_RESPONSE: GET /login -> Status 200 OK
