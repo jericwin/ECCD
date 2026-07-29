@@ -198,6 +198,18 @@ def classroom_view(classroom_id):
         fetch_all=True
     ) or []
          
+    # Fetch pending enrollment requests for this classroom
+    enrollment_requests = execute_query(
+        """SELECT er.*, l.full_name as learner_name, p.parent_name 
+           FROM enrollment_requests er
+           JOIN learners l ON er.learner_id = l.id
+           JOIN parents p ON l.parent_id = p.id
+           WHERE er.classroom_id = %s AND er.status = 'pending'
+           ORDER BY er.created_at DESC""",
+        (classroom_id,),
+        fetch_all=True
+    ) or []
+         
     return render_template(
         'teacher/classroom_view.html',
         active_page='classrooms',
@@ -208,7 +220,8 @@ def classroom_view(classroom_id):
         unassigned_learners=unassigned_learners,
         grades_dict=grades_dict,
         upcoming_classwork=upcoming_classwork,
-        recent_submissions=recent_submissions
+        recent_submissions=recent_submissions,
+        enrollment_requests=enrollment_requests
     )
 
 @teacher_bp.route('/teacher/classrooms/<int:classroom_id>/grades/save', methods=['POST'])
@@ -538,7 +551,8 @@ def handle_enrollment_request(request_id):
         execute_query("UPDATE enrollment_requests SET status = 'rejected' WHERE id = %s", (request_id,), commit=True)
         flash("Enrollment request rejected.", "success")
         
-    return redirect(url_for('teacher.enrollment_requests'))
+    redirect_url = request.referrer or url_for('teacher.enrollment_requests')
+    return redirect(redirect_url)
 
 
 @teacher_bp.route('/teacher/learners')

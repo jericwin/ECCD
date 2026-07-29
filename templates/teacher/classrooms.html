@@ -48,30 +48,19 @@
                                 </p>
                                 <div class="border-top pt-3 mt-2">
                                     <div class="d-flex justify-content-between text-muted small mb-3">
-                                        <span><i class="bi bi-people-fill me-1"></i>{{ classroom.learners_count or 0 }} Enrolled</span>
+                                        <span><i class="bi bi-people-fill me-1"></i>{{ classroom.learners_count or 0 }} / {{ classroom.max_learners or 30 }} Enrolled</span>
                                         <span><i class="bi bi-calendar-range me-1"></i>{{ classroom.school_year }}</span>
                                     </div>
                                     <div class="d-flex gap-2">
                                         <a href="{{ url_for('teacher.classroom_view', classroom_id=classroom.id) }}" class="btn btn-success btn-sm w-100 text-white">
                                             Open Class
                                         </a>
-                                        <div class="dropdown">
-                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                More
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px;">
-                                                <li>
-                                                    <form action="{{ url_for('teacher.archive_classroom', classroom_id=classroom.id) }}" method="POST">
-                                                        <button type="submit" class="dropdown-item py-2 text-warning"><i class="bi bi-archive me-2"></i>Archive</button>
-                                                    </form>
-                                                </li>
-                                                <li>
-                                                    <form action="{{ url_for('teacher.delete_classroom', classroom_id=classroom.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this classroom? This cannot be undone.');">
-                                                        <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-trash3 me-2"></i>Delete</button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        <form action="{{ url_for('teacher.archive_classroom', classroom_id=classroom.id) }}" method="POST" class="w-auto">
+                                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Archive" data-bs-toggle="tooltip"><i class="bi bi-archive"></i></button>
+                                        </form>
+                                        <form action="{{ url_for('teacher.delete_classroom', classroom_id=classroom.id) }}" method="POST" class="w-auto" onsubmit="return confirm('Are you sure you want to delete this classroom? This cannot be undone.');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete" data-bs-toggle="tooltip"><i class="bi bi-trash3"></i></button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

@@ -496,6 +496,23 @@ def enroll():
         query=query
     )
 
+@parent_bp.route('/parent/unenroll/<int:classroom_id>', methods=['POST'])
+def unenroll(classroom_id):
+    if 'user_id' not in session or session.get('role') != 'parent':
+        return redirect(url_for('auth.login'))
+        
+    parent, learner = get_parent_and_child(session['user_id'])
+    if not learner:
+        flash("Please set up your child's profile first.", "error")
+        return redirect(url_for('parent.dashboard'))
+
+    # Delete from classroom_learners and enrollment_requests
+    execute_query("DELETE FROM classroom_learners WHERE classroom_id = %s AND learner_id = %s", (classroom_id, learner['id']), commit=True)
+    execute_query("DELETE FROM enrollment_requests WHERE classroom_id = %s AND learner_id = %s", (classroom_id, learner['id']), commit=True)
+    
+    flash("Successfully unenrolled from the classroom.", "success")
+    return redirect(url_for('parent.dashboard'))
+
 @parent_bp.route('/parent/classroom/<int:classroom_id>')
 def classroom_view(classroom_id):
     if 'user_id' not in session or session.get('role') != 'parent':

@@ -48,6 +48,14 @@
             <i class="bi bi-award me-1"></i> Grades & Progress
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold text-muted" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests-panel" type="button" role="tab" aria-controls="requests-panel" aria-selected="false">
+            <i class="bi bi-person-plus me-1"></i> Requests
+            {% if enrollment_requests %}
+                <span class="badge bg-danger ms-1">{{ enrollment_requests | length }}</span>
+            {% endif %}
+        </button>
+    </li>
 </ul>
 
 <!-- Tabs Content Panels -->
@@ -475,6 +483,51 @@
             {% else %}
                 <div class="text-center py-5">
                     <p class="text-muted">No learners enrolled to view progress logs.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 5. REQUESTS PANEL -->
+    <div class="tab-pane fade" id="requests-panel" role="tabpanel" aria-labelledby="requests-tab">
+        <div class="card border border-light-subtle shadow-sm p-4 bg-white">
+            <h4 class="fw-bold mb-4">Pending Enrollment Requests</h4>
+            {% if enrollment_requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Learner Name</th>
+                                <th>Parent Name</th>
+                                <th>Date Requested</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in enrollment_requests %}
+                            <tr>
+                                <td class="fw-bold">{{ req.learner_name }}</td>
+                                <td class="text-muted">{{ req.parent_name }}</td>
+                                <td>{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td class="text-end">
+                                    <form action="{{ url_for('teacher.handle_enrollment_request', request_id=req.id) }}" method="POST" class="d-inline-block">
+                                        <input type="hidden" name="action" value="accept">
+                                        <button type="submit" class="btn btn-sm btn-success text-white fw-bold"><i class="bi bi-check-circle me-1"></i> Accept</button>
+                                    </form>
+                                    <form action="{{ url_for('teacher.handle_enrollment_request', request_id=req.id) }}" method="POST" class="d-inline-block">
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onsubmit="return confirm('Reject this request?');"><i class="bi bi-x-circle"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">No pending enrollment requests.</p>
                 </div>
             {% endif %}
         </div>
