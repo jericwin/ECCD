@@ -12,32 +12,58 @@ from routes.school import school_bp
 from routes.superadmin import superadmin_bp
 
 def create_app():
-    app = Flask(__name__)
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(base_dir, 'templates'),
+        static_folder=os.path.join(base_dir, 'static')
+    )
     app.config.from_object(Config)
     
-    # Configure file logging
+    # Configure logging
     import logging
-    from logging.handlers import RotatingFileHandler
+    import sys
     
-    file_handler = RotatingFileHandler('app.log', maxBytes=10000000, backupCount=3)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s'
-    ))
-    file_handler.setLevel(logging.INFO)
+    app.logger.handlers.clear()
+    formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+
+    if os.environ.get('VERCEL'):
+        # On Vercel, log to stdout so logs are visible in the Vercel dashboard
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setFormatter(formatter)
+        stream_handler.setLevel(logging.INFO)
+        app.logger.addHandler(stream_handler)
+        
+        db_logger = logging.getLogger('db')
+        db_logger.handlers.clear()
+        db_logger.addHandler(stream_handler)
+        db_logger.setLevel(logging.INFO)
+    else:
+        from logging.handlers import RotatingFileHandler
+        try:
+            file_handler = RotatingFileHandler('app.log', maxBytes=10000000, backupCount=3)
+            file_handler.setFormatter(formatter)
+            file_handler.setLevel(logging.INFO)
+            app.logger.addHandler(file_handler)
+            
+            db_logger = logging.getLogger('db')
+            db_logger.handlers.clear()
+            db_logger.addHandler(file_handler)
+            db_logger.setLevel(logging.INFO)
+        except Exception:
+            stream_handler = logging.StreamHandler(sys.stdout)
+            stream_handler.setFormatter(formatter)
+            app.logger.addHandler(stream_handler)
     
-    app.logger.addHandler(file_handler)
     app.logger.setLevel(logging.INFO)
     
-    db_logger = logging.getLogger('db')
-    db_logger.addHandler(file_handler)
-    db_logger.setLevel(logging.INFO)
-    
-    # Ensure upload directories exist
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'teachers'), exist_ok=True)
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'learners'), exist_ok=True)
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'classrooms'), exist_ok=True)
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'posts'), exist_ok=True)
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'classwork'), exist_ok=True)
+    # Ensure upload directories exist safely
+    subfolders = ['teachers', 'learners', 'classrooms', 'posts', 'classwork', 'certificates', 'submissions']
+    for sf in subfolders:
+        try:
+            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], sf), exist_ok=True)
+        except Exception as e:
+            app.logger.warning(f"Could not create upload directory for {sf}: {e}")
     
     # Register blueprints
     app.register_blueprint(main_bp)
@@ -63,12 +89,22 @@ def create_app():
             return dict(unread_notifications=notifications)
         return dict(unread_notifications=[])
     
-    # Override static uploads handler to serve from unsynced folder
+    # Override static uploads handler to serve from dynamic upload folder or fallback to bundled uploads
     @app.route('/static/uploads/<path:filename>')
     def serve_uploads(filename):
-        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        app.logger.info(f"Serve Upload: {filename} from {path} | Exists: {os.path.exists(path)}")
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        # 1. Check dynamic uploads folder (e.g. /tmp/uploads on Vercel or local uploads)
+        dynamic_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(dynamic_path):
+            return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+        # 2. Check bundled uploads folder in the repository (e.g. landing videos)
+        bundled_folder = os.path.join(base_dir, 'uploads')
+        bundled_path = os.path.join(bundled_folder, filename)
+        if os.path.exists(bundled_path):
+            return send_from_directory(bundled_folder, filename)
+
+        from flask import abort
+        abort(404)
         
     @app.before_request
     def log_request():

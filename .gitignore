@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments & local env
+.env*
+!.env.example
+.venv
+env/
+venv/
+ENV/
+
+# Logs
+*.log
+app.log
+
+# Vercel build output & project config
+.vercel
+
+# Dynamic uploads (preserve folder structure & landing assets)
+uploads/teachers/*
+uploads/learners/*
+uploads/classrooms/*
+uploads/posts/*
+uploads/classwork/*
+uploads/certificates/*
+uploads/submissions/*
+!uploads/**/.gitkeep
