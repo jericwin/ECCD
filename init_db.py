@@ -1,33 +1,13 @@
-import mysql.connector
-from config import Config
 import os
+from config import Config
+from db import get_db_connection, execute_query
+from werkzeug.security import generate_password_hash
 
 def init_db():
-    print(f"Initializing database '{Config.DB_NAME}' on {Config.DB_HOST}...")
+    print(f"Connecting to database '{Config.DB_NAME}' on {Config.DB_HOST}:{Config.DB_PORT}...")
     
-    # Try to connect without specifying database to create database if it doesn't exist
     try:
-        conn = mysql.connector.connect(
-            host=Config.DB_HOST,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD
-        )
-        cursor = conn.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {Config.DB_NAME}")
-        cursor.close()
-        conn.close()
-        print(f"Database '{Config.DB_NAME}' ensured.")
-    except Exception as e:
-        print(f"Warning: Could not create/verify database: {e}")
-
-    # Now connect to the database and run schema.sql
-    try:
-        conn = mysql.connector.connect(
-            host=Config.DB_HOST,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD,
-            database=Config.DB_NAME
-        )
+        conn = get_db_connection()
         cursor = conn.cursor()
         
         schema_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'schema.sql')
@@ -35,29 +15,45 @@ def init_db():
             print(f"Error: {schema_path} does not exist!")
             return
             
-        with open(schema_path, 'r') as f:
+        with open(schema_path, 'r', encoding='utf-8') as f:
             schema_sql = f.read()
             
-        # Split statements by semicolon
-        # Note: simplistic splitter, works as long as semi-colons are not within strings
         statements = schema_sql.split(';')
         for statement in statements:
             stmt = statement.strip()
             if stmt:
-                print(f"Executing: {stmt[:50]}...")
+                print(f"Executing: {stmt[:60]}...")
                 cursor.execute(stmt)
                 
         conn.commit()
-        print("Database schema loaded successfully!")
+        print("✓ Database schema tables loaded successfully!")
         
+        # Verify created tables
         cursor.execute("SHOW TABLES")
         tables = cursor.fetchall()
-        print(f"Created tables: {[t[0] for t in tables]}")
+        table_names = [list(t.values())[0] if isinstance(t, dict) else t[0] for t in tables]
+        print(f"✓ Found {len(table_names)} tables: {table_names}")
         
         cursor.close()
         conn.close()
+        
+        # Ensure superadmin user exists
+        admin = execute_query("SELECT id FROM users WHERE username = 'superadmin'", fetch_one=True)
+        if not admin:
+            hashed_pw = generate_password_hash('password123')
+            execute_query(
+                "INSERT INTO users (username, password, email, role) VALUES (%s, %s, %s, 'superadmin')",
+                ('superadmin', hashed_pw, 'superadmin@test.com'),
+                commit=True
+            )
+            print("✓ Default superadmin created (Username: superadmin | Password: password123)")
+        else:
+            print("✓ Superadmin account already exists.")
+            
+        print("\n🎉 Database initialization completed successfully!")
+        
     except Exception as e:
-        print(f"Error initializing schema: {e}")
+        print(f"\n❌ Error initializing database: {e}")
 
 if __name__ == "__main__":
     init_db()
