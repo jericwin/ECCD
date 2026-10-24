@@ -1,10 +1,15 @@
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, session
 import os
 from config import Config
 from routes.main import main_bp
 from routes.auth import auth_bp
 from routes.teacher import teacher_bp
 from routes.parent import parent_bp
+from routes.chat import chat_bp
+from routes.provincial import provincial_bp
+from routes.municipality import municipality_bp
+from routes.school import school_bp
+from routes.superadmin import superadmin_bp
 
 def create_app():
     app = Flask(__name__)
@@ -39,6 +44,24 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(teacher_bp)
     app.register_blueprint(parent_bp)
+    app.register_blueprint(chat_bp)
+    app.register_blueprint(provincial_bp)
+    app.register_blueprint(municipality_bp)
+    app.register_blueprint(school_bp)
+    app.register_blueprint(superadmin_bp)
+    
+    @app.context_processor
+    def inject_global_notifications():
+        if 'user_id' in session:
+            from db import execute_query
+            user_id = session['user_id']
+            notifications = execute_query(
+                "SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC",
+                (user_id,),
+                fetch_all=True
+            ) or []
+            return dict(unread_notifications=notifications)
+        return dict(unread_notifications=[])
     
     # Override static uploads handler to serve from unsynced folder
     @app.route('/static/uploads/<path:filename>')

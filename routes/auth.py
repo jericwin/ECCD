@@ -61,6 +61,14 @@ def login():
                 return redirect(url_for('teacher.dashboard'))
             elif role == 'parent':
                 return redirect(url_for('parent.dashboard'))
+            elif role == 'provincial':
+                return redirect(url_for('provincial.dashboard'))
+            elif role == 'municipality':
+                return redirect(url_for('municipality.dashboard'))
+            elif role == 'school':
+                return redirect(url_for('school.dashboard'))
+            elif role == 'superadmin':
+                return redirect(url_for('superadmin.dashboard'))
         else:
             flash('Invalid username/email or password. Please try again.', 'error')
             return render_template('login.html', login_identity=login_identity)
@@ -206,6 +214,8 @@ def register_parent():
         gender = request.form.get('gender')
         birthdate = request.form.get('birthdate')
         
+        school_id = request.form.get('school_id')
+        
         form_data = {
             'first_name': first_name, 'middle_name': middle_name, 'last_name': last_name, 'extension': extension,
             'email': email, 'mobile': mobile,
@@ -213,13 +223,18 @@ def register_parent():
             'child_first_name': child_first_name, 'child_middle_name': child_middle_name, 
             'child_last_name': child_last_name, 'child_extension': child_extension,
             'learner_id': learner_id, 'center_name': center_name,
-            'gender': gender, 'birthdate': birthdate
+            'gender': gender, 'birthdate': birthdate,
+            'school_id': school_id
         }
         
         # Validation
         if password != confirm_password:
             flash('Passwords do not match.', 'error')
             return render_template('register_parent.html', form_data=form_data)
+            
+        if not school_id:
+            flash('Please select a school to enroll in from the map.', 'error')
+            return redirect(url_for('main.landing'))
             
         # Check duplicate username or email
         existing_user = execute_query(
@@ -270,13 +285,34 @@ def register_parent():
             parent_pk = parent_res['lastrowid']
             
             # Insert learner
-            execute_query(
+            learner_res = execute_query(
                 "INSERT INTO learners (parent_id, learner_id, full_name, relationship, center_name, photo, gender, birthdate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (parent_pk, learner_id, learner_full_name, relationship, center_name, photo_filename, gender, birthdate),
                 commit=True
             )
-            flash('Registration successful! Please login.', 'success')
-            return redirect(url_for('auth.login', role='parent'))
+            learner_pk = learner_res['lastrowid']
+            
+            # Create enrollment request for the school
+            execute_query(
+                "INSERT INTO enrollment_requests (school_id, learner_id, status) VALUES (%s, %s, 'pending')",
+                (school_id, learner_pk),
+                commit=True
+            )
+            
+            # Notify school admins
+            school_admins = execute_query(
+                "SELECT user_id FROM school_admins WHERE school_id = %s",
+                (school_id,), fetch_all=True
+            ) or []
+            for sa in school_admins:
+                execute_query(
+                    "INSERT INTO notifications (user_id, title, message, link_url) VALUES (%s, %s, %s, %s)",
+                    (sa['user_id'], 'New Enrollment Request', f'A new enrollment request for {learner_full_name} is pending review.', '/school/dashboard'),
+                    commit=True
+                )
+            
+            flash('Registration successful! Your enrollment application is pending approval.', 'success')
+            return redirect(url_for('auth.login'))
         except Exception as e:
             flash(f'An error occurred during registration: {e}', 'error')
             return render_template('register_parent.html', form_data=form_data)

@@ -1,0 +1,153 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Municipality Dashboard - ECCD System{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0 text-dark">Municipality Dashboard</h2>
+        <p class="text-muted mb-0">{{ admin.name }} — Manage daycare/school centers in your area.</p>
+    </div>
+    <a href="{{ url_for('municipality.schools') }}" class="btn btn-primary rounded-pill shadow-sm px-4">
+        <i class="bi bi-plus-lg me-1"></i> Register New School
+    </a>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-white" style="background: linear-gradient(135deg,#1a73e8,#0d47a1); border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-building fs-3"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase text-truncate" style="font-size:.75rem;letter-spacing:.5px;">Total Schools</h6>
+                    <h2 class="mb-0 fw-bold">{{ schools_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-white" style="background: linear-gradient(135deg,#2e7d32,#1b5e20); border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-check-circle fs-3"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase text-truncate" style="font-size:.75rem;letter-spacing:.5px;">Approved Schools</h6>
+                    <h2 class="mb-0 fw-bold">{{ approved_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-dark" style="background: linear-gradient(135deg,#f9a825,#f57f17); border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-50 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-hourglass-split fs-3"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <h6 class="mb-1 fw-bold text-uppercase text-truncate" style="font-size:.75rem;letter-spacing:.5px;color:rgba(0,0,0,.55);">Pending</h6>
+                    <h2 class="mb-0 fw-bold">{{ pending_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-white" style="background: linear-gradient(135deg,#c62828,#b71c1c); border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-x-circle fs-3"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase text-truncate" style="font-size:.75rem;letter-spacing:.5px;">Rejected</h6>
+                    <h2 class="mb-0 fw-bold">{{ rejected_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enrollment Info Banner -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:16px; background: linear-gradient(135deg,#e3f2fd,#bbdefb);">
+    <div class="card-body p-4 d-flex align-items-center gap-4">
+        <i class="bi bi-people-fill fs-1 text-primary"></i>
+        <div>
+            <h5 class="fw-bold mb-1 text-dark">Total Enrolled Learners in Municipality</h5>
+            <p class="mb-0 text-muted">Across all approved schools in your municipality</p>
+        </div>
+        <div class="ms-auto">
+            <span class="display-6 fw-bold text-primary">{{ total_enrolled }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Schools -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center rounded-top-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history text-primary me-2"></i>Recent Schools</h5>
+        <a href="{{ url_for('municipality.schools') }}" class="btn btn-sm btn-outline-primary rounded-pill">View All</a>
+    </div>
+    <div class="card-body p-0">
+        {% if recent_schools %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary small">
+                    <tr>
+                        <th class="ps-4">School Name</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Registered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in recent_schools %}
+                    <tr>
+                        <td class="ps-4 fw-semibold text-dark">{{ s.name }}</td>
+                        <td class="text-muted small">{{ s.address or '—' }}</td>
+                        <td>
+                            {% if s.status == 'approved' %}<span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1">Approved</span>
+                            {% elif s.status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1">Pending</span>
+                            {% else %}<span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-1">Rejected</span>{% endif %}
+                        </td>
+                        <td class="text-muted small">{{ s.created_at.strftime('%b %d, %Y') if s.created_at else 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-building fs-1 text-primary opacity-50 d-block mb-3"></i>
+            <h5>No schools registered yet.</h5>
+            <p>Click <strong>Register New School</strong> to get started.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Notifications Preview -->
+{% if notifications %}
+<div class="card border-0 shadow-sm" style="border-radius:16px;">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center rounded-top-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-bell-fill text-warning me-2"></i>Unread Notifications</h5>
+        <a href="{{ url_for('municipality.notifications') }}" class="btn btn-sm btn-outline-warning rounded-pill">View All</a>
+    </div>
+    <div class="list-group list-group-flush rounded-bottom-4">
+        {% for n in notifications %}
+        <div class="list-group-item border-0 px-4 py-3 d-flex align-items-start gap-3">
+            <div class="bg-warning bg-opacity-10 rounded-circle p-2 mt-1" style="width:36px;height:36px;flex-shrink:0;">
+                <i class="bi bi-bell text-warning"></i>
+            </div>
+            <div>
+                <div class="fw-semibold small">{{ n.title }}</div>
+                <div class="text-muted" style="font-size:.8rem;">{{ n.message }}</div>
+                <div class="text-muted" style="font-size:.75rem;">{{ n.created_at.strftime('%b %d, %Y %I:%M %p') if n.created_at else '' }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

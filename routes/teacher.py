@@ -451,10 +451,14 @@ def publish_classroom(classroom_id):
 def delete_classroom(classroom_id):
     if 'user_id' not in session or session.get('role') != 'teacher':
         return redirect(url_for('auth.login'))
-    execute_query("DELETE FROM classrooms WHERE id = %s", (classroom_id,), commit=True)
+    
+    teacher = get_teacher_profile(session['user_id'])
+    if not teacher:
+        return redirect(url_for('main.landing'))
+        
+    execute_query("DELETE FROM classrooms WHERE id = %s AND teacher_id = %s", (classroom_id, teacher['id']), commit=True)
     flash("Classroom deleted.", "success")
     return redirect(url_for('teacher.classrooms'))
-
 @teacher_bp.route('/teacher/enrollment_requests')
 def enrollment_requests():
     if 'user_id' not in session or session.get('role') != 'teacher':
@@ -801,13 +805,93 @@ def learner_health(learner_id):
         (learner_id,),
         fetch_all=True
     ) or []
+
+    interventions = execute_query(
+        """SELECT iv.*, t.full_name as teacher_name
+           FROM interventions iv
+           JOIN teachers t ON iv.teacher_id = t.id
+           WHERE iv.learner_id = %s
+           ORDER BY iv.created_at DESC""",
+        (learner_id,),
+        fetch_all=True
+    ) or []
     
     return render_template(
         'teacher/learner_health.html',
         active_page='learners',
         learner=learner,
-        bmi_records=bmi_records
+        bmi_records=bmi_records,
+        interventions=interventions
     )
+
+
+@teacher_bp.route('/teacher/learners/<int:learner_id>/interventions/add', methods=['POST'])
+def add_intervention(learner_id):
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('auth.login'))
+
+    teacher = get_teacher_profile(session['user_id'])
+    if not teacher:
+        return redirect(url_for('auth.login'))
+
+    program_type = request.form.get('program_type', '').strip()
+    bmi_status   = request.form.get('bmi_status', '').strip()
+    description  = request.form.get('description', '').strip()
+    start_date   = request.form.get('start_date')
+    end_date     = request.form.get('end_date') or None
+
+    if not all([program_type, bmi_status, description, start_date]):
+        flash('Please fill in all required fields.', 'error')
+        return redirect(url_for('teacher.learner_health', learner_id=learner_id))
+
+    try:
+        execute_query(
+            """INSERT INTO interventions
+               (learner_id, teacher_id, bmi_status, program_type, description, start_date, end_date)
+               VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (learner_id, teacher['id'], bmi_status, program_type, description, start_date, end_date),
+            commit=True
+        )
+        flash('Intervention program added successfully!', 'success')
+    except Exception as e:
+        flash(f'Error adding intervention: {e}', 'error')
+
+    return redirect(url_for('teacher.learner_health', learner_id=learner_id))
+
+
+@teacher_bp.route('/teacher/interventions/<int:iv_id>/update', methods=['POST'])
+def update_intervention(iv_id):
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('auth.login'))
+
+    teacher = get_teacher_profile(session['user_id'])
+    if not teacher:
+        return redirect(url_for('auth.login'))
+
+    # Verify ownership via teacher_id
+    iv = execute_query(
+        "SELECT * FROM interventions WHERE id = %s AND teacher_id = %s",
+        (iv_id, teacher['id']), fetch_one=True
+    )
+    if not iv:
+        flash('Intervention not found or access denied.', 'error')
+        return redirect(url_for('teacher.learners'))
+
+    new_status = request.form.get('status', '').strip()
+    outcome    = request.form.get('outcome', '').strip()
+
+    if new_status not in ('ongoing', 'completed', 'cancelled'):
+        flash('Invalid status.', 'error')
+        return redirect(url_for('teacher.learner_health', learner_id=iv['learner_id']))
+
+    execute_query(
+        "UPDATE interventions SET status = %s, outcome = %s WHERE id = %s",
+        (new_status, outcome or None, iv_id),
+        commit=True
+    )
+    flash(f'Intervention marked as {new_status}.', 'success')
+    return redirect(url_for('teacher.learner_health', learner_id=iv['learner_id']))
+
 
 @teacher_bp.route('/teacher/reports')
 def reports():
@@ -1403,3 +1487,91 @@ def update_birth_cert_remarks():
             
     flash("Remarks saved successfully.", "success")
     return redirect(request.referrer or url_for('teacher.learners'))
+
+
+# ─── Group Chat (Teacher side) ─────────────────────────────────────────────────
+
+@teacher_bp.route('/teacher/group-chat/<int:classroom_id>')
+def group_chat(classroom_id):
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('auth.login'))
+
+    teacher = get_teacher_profile(session['user_id'])
+    if not teacher:
+        return redirect(url_for('auth.login'))
+
+    classroom = execute_query(
+        """SELECT c.*, t.full_name as teacher_name
+           FROM classrooms c
+           JOIN teachers t ON c.teacher_id = t.id
+           WHERE c.id = %s AND c.teacher_id = %s""",
+        (classroom_id, teacher['id']),
+        fetch_one=True
+    )
+    if not classroom:
+        flash('Classroom not found or access denied.', 'error')
+        return redirect(url_for('teacher.classrooms'))
+
+    # Build members list: teacher + parents of enrolled learners
+    members = [{'name': teacher['full_name'], 'role': 'teacher',
+                 'user_id': session['user_id']}]
+    parents = execute_query(
+        """SELECT p.parent_name as name, u.id as user_id
+           FROM parents p
+           JOIN users u ON p.user_id = u.id
+           JOIN learners l ON l.parent_id = p.id
+           JOIN classroom_learners cl ON cl.learner_id = l.id
+           WHERE cl.classroom_id = %s""",
+        (classroom_id,),
+        fetch_all=True
+    ) or []
+    for pa in parents:
+        members.append({'name': pa['name'], 'role': 'parent', 'user_id': pa['user_id']})
+
+    messages = execute_query(
+        """SELECT * FROM group_chat_messages
+           WHERE classroom_id = %s ORDER BY sent_at ASC""",
+        (classroom_id,),
+        fetch_all=True
+    ) or []
+
+    return render_template(
+        'teacher/group_chat.html',
+        active_page='classrooms',
+        classroom=classroom,
+        members=members,
+        messages=messages,
+        current_user_id=session['user_id']
+    )
+
+
+@teacher_bp.route('/teacher/group-chat/<int:classroom_id>/send', methods=['POST'])
+def group_chat_send(classroom_id):
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('auth.login'))
+
+    teacher = get_teacher_profile(session['user_id'])
+    if not teacher:
+        return redirect(url_for('auth.login'))
+
+    # Verify ownership
+    owned = execute_query(
+        "SELECT id FROM classrooms WHERE id = %s AND teacher_id = %s",
+        (classroom_id, teacher['id']),
+        fetch_one=True
+    )
+    if not owned:
+        flash('Access denied.', 'error')
+        return redirect(url_for('teacher.classrooms'))
+
+    message = request.form.get('message', '').strip()
+    if message:
+        execute_query(
+            """INSERT INTO group_chat_messages
+               (classroom_id, sender_user_id, sender_name, sender_role, message)
+               VALUES (%s, %s, %s, 'teacher', %s)""",
+            (classroom_id, session['user_id'], teacher['full_name'], message),
+            commit=True
+        )
+
+    return redirect(url_for('teacher.group_chat', classroom_id=classroom_id))

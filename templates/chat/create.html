@@ -1,0 +1,210 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<style>
+  .create-card { background:#fff; border-radius:18px; padding:2rem; box-shadow:0 2px 16px rgba(0,0,0,0.07); max-width:620px; margin:auto; }
+  .create-card h5 { font-weight:700; color:#1a7a4a; }
+
+  .form-label-styled { font-weight:600; color:#495057; font-size:0.88rem; margin-bottom:0.3rem; }
+  .input-styled {
+    width:100%; border:1.5px solid #c8e6c9; border-radius:10px;
+    padding:0.6rem 1rem; font-size:0.92rem; outline:none;
+    transition:border-color 0.2s;
+  }
+  .input-styled:focus { border-color:#1a7a4a; }
+
+  /* Member search */
+  .search-wrap { position:relative; }
+  .search-results {
+    position:absolute; top:calc(100% + 4px); left:0; right:0;
+    background:#fff; border:1.5px solid #c8e6c9; border-radius:10px;
+    z-index:100; max-height:200px; overflow-y:auto;
+    box-shadow:0 4px 16px rgba(0,0,0,0.1);
+    display:none;
+  }
+  .search-results.show { display:block; }
+  .search-result-item {
+    padding:0.55rem 1rem; cursor:pointer; display:flex; align-items:center; gap:0.6rem;
+    font-size:0.88rem; transition:background 0.15s;
+  }
+  .search-result-item:hover { background:#f0faf4; }
+  .result-avatar {
+    width:30px; height:30px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.78rem; font-weight:700; color:#fff;
+  }
+  .av-teacher { background:#1a7a4a; }
+  .av-parent  { background:#5c6bc0; }
+
+  /* Selected chips */
+  .selected-members { display:flex; flex-wrap:wrap; gap:0.4rem; min-height:36px; }
+  .member-chip {
+    display:inline-flex; align-items:center; gap:0.35rem;
+    background:#e8f5ee; border:1px solid #b2dfdb; border-radius:20px;
+    padding:4px 10px 4px 8px; font-size:0.82rem; font-weight:600; color:#1a7a4a;
+  }
+  .member-chip .chip-av {
+    width:20px; height:20px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.65rem; font-weight:700; color:#fff;
+  }
+  .member-chip .remove-chip {
+    background:none; border:none; padding:0; cursor:pointer;
+    color:#78909c; font-size:0.9rem; line-height:1; margin-left:2px;
+  }
+  .member-chip .remove-chip:hover { color:#e53935; }
+
+  .role-pill {
+    font-size:0.65rem; font-weight:700; padding:1px 7px; border-radius:8px;
+    text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .pill-teacher { background:#fff3cd; color:#7b5800; }
+  .pill-parent  { background:#d1ecf1; color:#0c5460; }
+
+  .btn-create {
+    background:linear-gradient(135deg,#22a86a,#1a7a4a);
+    color:#fff; border:none; border-radius:22px;
+    padding:0.65rem 2rem; font-weight:700; font-size:0.95rem;
+    width:100%; cursor:pointer; transition:opacity 0.2s;
+    margin-top:1rem;
+  }
+  .btn-create:hover { opacity:0.9; }
+  .back-link { color:#6c757d; font-size:0.85rem; text-decoration:none; }
+  .back-link:hover { color:#1a7a4a; }
+</style>
+
+<div class="mb-3">
+  <a href="{{ url_for('chat.list_chats') }}" class="back-link">
+    <i class="bi bi-arrow-left me-1"></i> Back to Chats
+  </a>
+</div>
+
+<div class="create-card">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#22a86a,#1a7a4a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;">
+      <i class="bi bi-people-fill"></i>
+    </div>
+    <h5 class="mb-0">Create New Group</h5>
+  </div>
+
+  <form method="POST" action="{{ url_for('chat.create_chat') }}" id="createForm">
+    <!-- Group name -->
+    <div class="mb-4">
+      <div class="form-label-styled">Group Name <span class="text-danger">*</span></div>
+      <input type="text" name="group_name" class="input-styled" placeholder="e.g. Grade 1 Parents Chat" required autofocus>
+    </div>
+
+    <!-- Member search -->
+    <div class="mb-3">
+      <div class="form-label-styled">Add Members</div>
+      <div class="search-wrap">
+        <input type="text" id="memberSearch" class="input-styled" placeholder="Search by name…" autocomplete="off">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Selected members chips -->
+    <div class="mb-4">
+      <div class="form-label-styled mb-2">Selected Members</div>
+      <div class="selected-members" id="selectedMembers">
+        <span class="text-muted small" id="noMembersHint">No members added yet</span>
+      </div>
+      <!-- Hidden inputs for selected user ids -->
+      <div id="hiddenInputs"></div>
+    </div>
+
+    <button type="submit" class="btn-create">
+      <i class="bi bi-check2-circle me-2"></i>Create Group Chat
+    </button>
+  </form>
+</div>
+
+<script>
+const availableUsers = {{ available_users | tojson }};
+let selected = {}; // user_id -> user object
+
+const searchInput   = document.getElementById('memberSearch');
+const searchResults = document.getElementById('searchResults');
+const selectedBox   = document.getElementById('selectedMembers');
+const hiddenInputs  = document.getElementById('hiddenInputs');
+const noHint        = document.getElementById('noMembersHint');
+
+function renderResults(users) {
+  if (!users.length) {
+    searchResults.innerHTML = '<div class="search-result-item text-muted">No results found</div>';
+  } else {
+    searchResults.innerHTML = users.map(u => `
+      <div class="search-result-item" onclick="addMember(${u.user_id})">
+        <div class="result-avatar ${u.role === 'teacher' ? 'av-teacher' : 'av-parent'}">${u.display_name[0].toUpperCase()}</div>
+        <span class="fw-semibold">${u.display_name}</span>
+        <span class="role-pill ${u.role === 'teacher' ? 'pill-teacher' : 'pill-parent'} ms-auto">${u.role}</span>
+      </div>
+    `).join('');
+  }
+  searchResults.classList.add('show');
+}
+
+searchInput.addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  const filtered = q
+    ? availableUsers.filter(u => u.display_name.toLowerCase().includes(q) && !selected[u.user_id])
+    : availableUsers.filter(u => !selected[u.user_id]);
+  if (this.value.trim()) renderResults(filtered);
+  else searchResults.classList.remove('show');
+});
+
+searchInput.addEventListener('focus', function() {
+  const q = this.value.trim().toLowerCase();
+  if (q) {
+    const filtered = availableUsers.filter(u => u.display_name.toLowerCase().includes(q) && !selected[u.user_id]);
+    renderResults(filtered);
+  }
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) searchResults.classList.remove('show');
+});
+
+function addMember(uid) {
+  const u = availableUsers.find(x => x.user_id == uid);
+  if (!u || selected[uid]) return;
+  selected[uid] = u;
+  renderChips();
+  searchInput.value = '';
+  searchResults.classList.remove('show');
+}
+
+function removeMember(uid) {
+  delete selected[uid];
+  renderChips();
+}
+
+function renderChips() {
+  const ids = Object.keys(selected);
+  noHint.style.display = ids.length ? 'none' : '';
+  // Remove old chips
+  selectedBox.querySelectorAll('.member-chip').forEach(el => el.remove());
+  // Remove old hidden inputs
+  hiddenInputs.innerHTML = '';
+
+  ids.forEach(uid => {
+    const u = selected[uid];
+    const chip = document.createElement('div');
+    chip.className = 'member-chip';
+    chip.innerHTML = `
+      <div class="chip-av ${u.role === 'teacher' ? 'av-teacher' : 'av-parent'}">${u.display_name[0].toUpperCase()}</div>
+      ${u.display_name}
+      <span class="role-pill ${u.role === 'teacher' ? 'pill-teacher' : 'pill-parent'}">${u.role}</span>
+      <button type="button" class="remove-chip" onclick="removeMember(${uid})"><i class="bi bi-x"></i></button>
+    `;
+    selectedBox.appendChild(chip);
+
+    const inp = document.createElement('input');
+    inp.type  = 'hidden';
+    inp.name  = 'member_ids';
+    inp.value = uid;
+    hiddenInputs.appendChild(inp);
+  });
+}
+</script>
+{% endblock %}

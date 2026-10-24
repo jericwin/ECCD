@@ -1,0 +1,361 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Account Management - Super Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0 text-dark">Account Management</h2>
+        <p class="text-muted mb-0">Create, edit, and control all user accounts.</p>
+    </div>
+    <button class="btn btn-primary rounded-pill shadow-sm px-4" data-bs-toggle="modal" data-bs-target="#createAccountModal">
+        <i class="bi bi-person-plus me-1"></i> Create Account
+    </button>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-body p-3">
+        <form method="GET" action="{{ url_for('superadmin.accounts') }}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-0 bg-light" placeholder="Search username or email..." value="{{ search }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="role" class="form-select border-0 bg-light">
+                    <option value="all"         {% if role_filter=='all'          %}selected{% endif %}>All Roles</option>
+                    <option value="superadmin"  {% if role_filter=='superadmin'   %}selected{% endif %}>Super Admin</option>
+                    <option value="provincial"  {% if role_filter=='provincial'   %}selected{% endif %}>Provincial</option>
+                    <option value="municipality"{% if role_filter=='municipality'  %}selected{% endif %}>Municipality</option>
+                    <option value="school"      {% if role_filter=='school'       %}selected{% endif %}>School Admin</option>
+                    <option value="teacher"     {% if role_filter=='teacher'      %}selected{% endif %}>Teacher</option>
+                    <option value="parent"      {% if role_filter=='parent'       %}selected{% endif %}>Parent</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select border-0 bg-light">
+                    <option value="all"      {% if status_filter=='all'      %}selected{% endif %}>All Status</option>
+                    <option value="active"   {% if status_filter=='active'   %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status_filter=='inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary rounded-pill w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Accounts Table -->
+<div class="card border-0 shadow-sm" style="border-radius:16px;">
+    <div class="card-header bg-white border-bottom py-3 rounded-top-4">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-people text-primary me-2"></i>All Accounts
+            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill ms-2">{{ users|length }}</span>
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary small">
+                    <tr>
+                        <th class="ps-4">Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Affiliated With</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th class="pe-4 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for u in users %}
+                <tr>
+                    <td class="ps-4 fw-semibold text-dark">{{ u.username }}</td>
+                    <td class="text-muted small">{{ u.email }}</td>
+                    <td>
+                        {% set role_colors = {'superadmin':'danger','provincial':'warning','municipality':'info','school':'primary','teacher':'success','parent':'secondary'} %}
+                        <span class="badge bg-{{ role_colors.get(u.role,'secondary') }} bg-opacity-10 text-{{ role_colors.get(u.role,'secondary') }} rounded-pill px-2 py-1 text-capitalize">{{ u.role }}</span>
+                    </td>
+                    <td class="text-muted small">
+                        {% if u.school_name %}{{ u.school_name }}
+                        {% elif u.municipality_name %}{{ u.municipality_name }}
+                        {% elif u.province_name %}{{ u.province_name }}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if u.is_active %}
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 py-1">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted small">{{ u.created_at.strftime('%b %d, %Y') if u.created_at else '—' }}</td>
+                    <td class="pe-4 text-end">
+                        <div class="d-flex gap-1 justify-content-end">
+                            <!-- Toggle Active -->
+                            <form action="{{ url_for('superadmin.toggle_user', user_id=u.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-light rounded-pill" title="{{ 'Deactivate' if u.is_active else 'Activate' }}">
+                                    <i class="bi {{ 'bi-toggle2-on text-success' if u.is_active else 'bi-toggle2-off text-muted' }} fs-5"></i>
+                                </button>
+                            </form>
+                            <!-- Edit -->
+                            <button class="btn btn-sm btn-light rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal{{ u.id }}" title="Edit">
+                                <i class="bi bi-pencil text-primary"></i>
+                            </button>
+                            <!-- Delete -->
+                            <form action="{{ url_for('superadmin.delete_user', user_id=u.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-light rounded-pill" title="Delete"
+                                        onclick="return confirm('Delete user {{ u.username }}? This cannot be undone.')">
+                                    <i class="bi bi-trash text-danger"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Edit Modal -->
+                <div class="modal fade" id="editModal{{ u.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog"><div class="modal-content border-0 shadow" style="border-radius:14px;">
+                        <div class="modal-header border-0 bg-light rounded-top-4">
+                            <h6 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Edit Account — {{ u.username }}</h6>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ url_for('superadmin.edit_user', user_id=u.id) }}" method="POST">
+                            <div class="modal-body p-4">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-semibold">Username</label>
+                                    <input type="text" name="username" class="form-control bg-light border-0" value="{{ u.username }}" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-semibold">Email</label>
+                                    <input type="email" name="email" class="form-control bg-light border-0" value="{{ u.email }}" required>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label small fw-semibold">New Password <span class="text-muted">(leave blank to keep)</span></label>
+                                    <input type="password" name="password" class="form-control bg-light border-0" placeholder="Enter new password">
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">Save Changes</button>
+                            </div>
+                        </form>
+                    </div></div>
+                </div>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-people fs-1 text-primary opacity-50 d-block mb-3"></i>
+            <h5>No accounts match your filters.</h5>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Create Account Modal -->
+<div class="modal fade" id="createAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow" style="border-radius:16px;">
+        <div class="modal-header border-0 bg-primary bg-opacity-10">
+            <h5 class="modal-title fw-bold"><i class="bi bi-person-plus me-2 text-primary"></i>Create New Account</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form action="{{ url_for('superadmin.create_admin') }}" method="POST">
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    <!-- Account Type -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Account Type <span class="text-danger">*</span></label>
+                        <select name="admin_type" class="form-select bg-light border-0" id="adminTypeSelect" required>
+                            <option value="">Select type...</option>
+                            <option value="provincial">Provincial Admin</option>
+                            <option value="municipality">Municipality Admin</option>
+                        </select>
+                    </div>
+
+                    <!-- Provincial: Region → Province multi-add via PSGC -->
+                    <div class="col-12" id="provinceField" style="display:none;">
+                        <label class="form-label fw-semibold">Assign Provinces <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-2 mb-2">
+                            <select id="acc_region" class="form-select bg-light border-0" style="flex:1;">
+                                <option value="">Select region...</option>
+                            </select>
+                            <select id="acc_province_pick" class="form-select bg-light border-0" style="flex:1;" disabled>
+                                <option value="">Select region first...</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-primary rounded-pill px-3 flex-shrink-0" id="addProvinceBtn">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                        <div id="provinceTagsBox" class="d-flex flex-wrap gap-2 mb-1 p-2 rounded bg-light" style="min-height:42px;border:1px solid #dee2e6;"></div>
+                        <small class="text-muted">You can add multiple provinces.</small>
+                        <div id="provinceHiddenInputs"></div>
+                    </div>
+
+                    <!-- Municipality: Province filter + municipality multi-add from DB -->
+                    <div class="col-12" id="municipalityField" style="display:none;">
+                        <label class="form-label fw-semibold">Assign Municipalities <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-2 mb-2">
+                            <select id="muni_province_filter" class="form-select bg-light border-0" style="flex:1;">
+                                <option value="">Filter by province...</option>
+                                {% for p in all_provinces %}
+                                <option value="{{ p.id }}">{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <select id="muni_pick" class="form-select bg-light border-0" style="flex:1;">
+                                <option value="">Select municipality...</option>
+                                {% for m in municipalities %}
+                                <option value="{{ m.id }}" data-prov="{{ m.province_id }}" data-label="{{ m.name }} ({{ m.province_name }})">{{ m.name }} ({{ m.province_name }})</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-outline-primary rounded-pill px-3 flex-shrink-0" id="addMuniBtn">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                        <div id="muniTagsBox" class="d-flex flex-wrap gap-2 mb-1 p-2 rounded bg-light" style="min-height:42px;border:1px solid #dee2e6;"></div>
+                        <small class="text-muted">You can add multiple municipalities.</small>
+                        <div id="muniHiddenInputs"></div>
+                    </div>
+
+                    <!-- Credentials -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control bg-light border-0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control bg-light border-0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password" class="form-control bg-light border-0" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Create Account</button>
+            </div>
+        </form>
+    </div></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Show/hide fields on account type change
+document.getElementById('adminTypeSelect').addEventListener('change', function() {
+    const isProv = this.value === 'provincial';
+    const isMuni = this.value === 'municipality';
+    document.getElementById('provinceField').style.display     = isProv ? '' : 'none';
+    document.getElementById('municipalityField').style.display = isMuni ? '' : 'none';
+    if (isProv) loadRegions();
+});
+
+// ── PROVINCIAL: PSGC Region -> Province multi-add ──────────────────────────
+let regionsLoaded = false;
+const selectedProvinces = {};
+
+function loadRegions() {
+    if (regionsLoaded) return;
+    const regionSel = document.getElementById('acc_region');
+    fetch('https://psgc.gitlab.io/api/regions/')
+        .then(r => r.json())
+        .then(data => {
+            data.sort((a,b) => a.name.localeCompare(b.name));
+            regionSel.innerHTML = '<option value="">Select region...</option>';
+            data.forEach(reg => {
+                const opt = document.createElement('option');
+                opt.value = reg.code; opt.textContent = reg.name;
+                regionSel.appendChild(opt);
+            });
+            regionsLoaded = true;
+        });
+    regionSel.addEventListener('change', function() {
+        const provSel = document.getElementById('acc_province_pick');
+        provSel.innerHTML = '<option value="">Loading...</option>';
+        provSel.disabled = true;
+        fetch(`https://psgc.gitlab.io/api/regions/${this.value}/provinces/`)
+            .then(r => r.json())
+            .then(data => {
+                data.sort((a,b) => a.name.localeCompare(b.name));
+                provSel.innerHTML = '<option value="">Select province...</option>';
+                data.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name; opt.textContent = p.name;
+                    provSel.appendChild(opt);
+                });
+                provSel.disabled = false;
+            });
+    });
+}
+
+document.getElementById('addProvinceBtn').addEventListener('click', function() {
+    const sel = document.getElementById('acc_province_pick');
+    const name = sel.value;
+    if (!name || selectedProvinces[name]) return;
+    selectedProvinces[name] = true;
+    renderProvinceTags();
+    sel.value = '';
+});
+
+function renderProvinceTags() {
+    const box = document.getElementById('provinceTagsBox');
+    const hidden = document.getElementById('provinceHiddenInputs');
+    box.innerHTML = ''; hidden.innerHTML = '';
+    Object.keys(selectedProvinces).forEach(name => {
+        const tag = document.createElement('span');
+        tag.className = 'badge bg-primary d-flex align-items-center gap-1 px-2 py-2';
+        tag.style.fontSize = '0.82rem';
+        tag.innerHTML = `<i class="bi bi-map-fill me-1"></i>${name}
+            <button type="button" class="btn-close btn-close-white ms-1" style="font-size:0.55rem;" onclick="removeProvince('${name.replace(/'/g,"\\'")}')"></button>`;
+        box.appendChild(tag);
+        const inp = document.createElement('input');
+        inp.type = 'hidden'; inp.name = 'province_names[]'; inp.value = name;
+        hidden.appendChild(inp);
+    });
+}
+function removeProvince(name) { delete selectedProvinces[name]; renderProvinceTags(); }
+
+// ── MUNICIPALITY: DB multi-add ─────────────────────────────────────────────
+const selectedMunis = {};
+
+document.getElementById('muni_province_filter').addEventListener('change', function() {
+    const provId = this.value;
+    document.getElementById('muni_pick').querySelectorAll('option').forEach(opt => {
+        if (!opt.value) { opt.style.display = ''; return; }
+        opt.style.display = (!provId || opt.dataset.prov === provId) ? '' : 'none';
+    });
+    document.getElementById('muni_pick').value = '';
+});
+
+document.getElementById('addMuniBtn').addEventListener('click', function() {
+    const sel = document.getElementById('muni_pick');
+    const id = sel.value;
+    if (!id || selectedMunis[id]) return;
+    selectedMunis[id] = sel.options[sel.selectedIndex].dataset.label || sel.options[sel.selectedIndex].text;
+    renderMuniTags();
+    sel.value = '';
+});
+
+function renderMuniTags() {
+    const box = document.getElementById('muniTagsBox');
+    const hidden = document.getElementById('muniHiddenInputs');
+    box.innerHTML = ''; hidden.innerHTML = '';
+    Object.entries(selectedMunis).forEach(([id, label]) => {
+        const tag = document.createElement('span');
+        tag.className = 'badge bg-info text-dark d-flex align-items-center gap-1 px-2 py-2';
+        tag.style.fontSize = '0.82rem';
+        tag.innerHTML = `<i class="bi bi-geo-alt-fill me-1"></i>${label}
+            <button type="button" class="btn-close ms-1" style="font-size:0.55rem;" onclick="removeMuni('${id}')"></button>`;
+        box.appendChild(tag);
+        const inp = document.createElement('input');
+        inp.type = 'hidden'; inp.name = 'municipality_ids[]'; inp.value = id;
+        hidden.appendChild(inp);
+    });
+}
+function removeMuni(id) { delete selectedMunis[id]; renderMuniTags(); }
+</script>
+{% endblock %}

@@ -11,6 +11,27 @@
 </div>
 
 <!-- Child Summary card -->
+{% if not classroom %}
+<div class="card p-5 border-0 shadow-sm bg-white mb-4 text-center text-muted">
+    {% if enrollment_request %}
+        {% if enrollment_request.status == 'pending' %}
+        <i class="bi bi-hourglass-split fs-1 text-warning mb-3 d-block"></i>
+        <h4 class="fw-bold text-dark">Enrollment Application Pending</h4>
+        <p>Your enrollment application for <strong>{{ learner.full_name }}</strong> is currently being reviewed by the school administration.</p>
+        <p class="small">You will gain full access to the dashboard once your application is accepted and your child is assigned to a classroom.</p>
+        {% elif enrollment_request.status == 'rejected' %}
+        <i class="bi bi-x-circle fs-1 text-danger mb-3 d-block"></i>
+        <h4 class="fw-bold text-dark">Enrollment Application Rejected</h4>
+        <p>Unfortunately, your enrollment application for <strong>{{ learner.full_name }}</strong> was rejected.</p>
+        <p class="small">Please contact the school administration for more information.</p>
+        {% endif %}
+    {% else %}
+        <i class="bi bi-exclamation-triangle fs-1 text-warning mb-3 d-block"></i>
+        <h4 class="fw-bold text-dark">Not Enrolled</h4>
+        <p>You have not applied for enrollment yet.</p>
+    {% endif %}
+</div>
+{% else %}
 <div class="card p-4 border-0 shadow-sm bg-white mb-4">
     <h5 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-person-fill text-success me-2"></i>My Child: {{ learner.full_name }}</h5>
     <div class="row g-3">
@@ -115,4 +136,6 @@
     </div>
     
 </div>
+</div>
+{% endif %}
 {% endblock %}

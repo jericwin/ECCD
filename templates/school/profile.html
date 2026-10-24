@@ -1,0 +1,285 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}School Profile - ECCD System{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet CSS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<!-- Leaflet Geocoder CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<style>
+    #schoolMap {
+        height: 350px;
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid #dee2e6;
+        z-index: 1; /* Prevent overlapping with modals */
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0 text-dark">School Profile</h2>
+        <p class="text-muted">Manage your school's information and enrollment capacity.</p>
+    </div>
+    <a href="{{ url_for('school.dashboard') }}" class="btn btn-outline-secondary rounded-pill shadow-sm">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card-body p-5">
+        <form action="{{ url_for('school.profile') }}" method="POST">
+            <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-building me-2"></i>School Details</h5>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">School Name</label>
+                    <input type="text" name="name" class="form-control form-control-lg bg-light" value="{{ school.name }}" required>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">Enrollment Capacity (Available Slots)</label>
+                    <input type="number" name="capacity" class="form-control form-control-lg bg-light" value="{{ school.capacity }}" min="1" required>
+                    <div class="form-text">Maximum number of learners this school can accommodate.</div>
+                </div>
+                
+                <div class="col-md-12 mb-2">
+                    <h6 class="fw-bold text-dark mt-3 border-bottom pb-2"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Location Search</h6>
+                    <p class="text-muted small mb-2">Search for your school or click on the map to automatically fill in the location details.</p>
+                    
+                    <!-- Location Search Input -->
+                    <div class="input-group mb-3 shadow-sm rounded-pill overflow-hidden">
+                        <span class="input-group-text bg-white border-0 ps-4"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="mapSearchInput" class="form-control border-0 py-2 bg-white" placeholder="Search for address, municipality, or landmark...">
+                        <button class="btn btn-primary px-4" type="button" id="mapSearchBtn">Search</button>
+                        <button class="btn btn-secondary px-3" type="button" id="getLocationBtn" title="Get My Current Location">
+                            <i class="bi bi-geo-fill"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="schoolMap" class="shadow-sm mb-3"></div>
+                </div>
+
+                <!-- Structured Address Fields -->
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold text-muted">Full Address (Auto-filled)</label>
+                    <textarea name="address" id="fullAddress" class="form-control bg-light" rows="2" readonly>{{ school.address }}</textarea>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">Street Address</label>
+                    <input type="text" name="street_address" id="streetAddress" class="form-control bg-light" value="{{ school.street_address or '' }}">
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">City / Municipality</label>
+                    <input type="text" name="city_municipality" id="cityMunicipality" class="form-control bg-light" value="{{ school.city_municipality or '' }}">
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">Province</label>
+                    <input type="text" name="province_name" id="provinceName" class="form-control bg-light" value="{{ school.province_name or '' }}">
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">Postal Code</label>
+                    <input type="text" name="postal_code" id="postalCode" class="form-control bg-light" value="{{ school.postal_code or '' }}">
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">Latitude</label>
+                    <input type="number" step="any" name="latitude" id="latitude" class="form-control bg-light" value="{{ school.latitude or '' }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">Longitude</label>
+                    <input type="number" step="any" name="longitude" id="longitude" class="form-control bg-light" value="{{ school.longitude or '' }}" readonly>
+                </div>
+            </div>
+            
+            <hr class="my-4 text-muted">
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge {{ 'bg-success' if school.is_accepting_enrollees else 'bg-danger' }} fs-6 px-3 py-2 rounded-pill">
+                        {{ 'Currently Accepting Enrollees' if school.is_accepting_enrollees else 'Not Accepting Enrollees' }}
+                    </span>
+                    <span class="ms-3 text-muted small">Current Status: <strong class="text-uppercase">{{ school.status }}</strong></span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
+                    <i class="bi bi-save me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- Leaflet Geocoder JS -->
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Default coordinates (Philippines center)
+    let defaultLat = 12.8797;
+    let defaultLng = 121.7740;
+    let defaultZoom = 6;
+    
+    // Check if we have existing coordinates
+    const existingLat = document.getElementById('latitude').value;
+    const existingLng = document.getElementById('longitude').value;
+    
+    if (existingLat && existingLng && !isNaN(existingLat) && !isNaN(existingLng)) {
+        defaultLat = parseFloat(existingLat);
+        defaultLng = parseFloat(existingLng);
+        defaultZoom = 15;
+    }
+    
+    // Initialize the map
+    const map = L.map('schoolMap').setView([defaultLat, defaultLng], defaultZoom);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Add draggable marker
+    let marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
+    
+    // Function to update form fields based on Nominatim result
+    function updateFormFields(lat, lng, addressObj) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+        
+        if (addressObj) {
+            // Extract components
+            const street = addressObj.road || addressObj.street || addressObj.pedestrian || addressObj.neighbourhood || '';
+            const city = addressObj.city || addressObj.town || addressObj.municipality || addressObj.village || addressObj.county || '';
+            const province = addressObj.state || addressObj.province || addressObj.region || '';
+            const postcode = addressObj.postcode || '';
+            const houseNumber = addressObj.house_number ? addressObj.house_number + ' ' : '';
+            
+            // Format full street address
+            const fullStreet = houseNumber + street;
+            
+            // Populate fields
+            document.getElementById('streetAddress').value = fullStreet;
+            document.getElementById('cityMunicipality').value = city;
+            document.getElementById('provinceName').value = province;
+            document.getElementById('postalCode').value = postcode;
+            
+            // Build and set full address for the textarea
+            const parts = [fullStreet, city, province, postcode, addressObj.country].filter(Boolean);
+            document.getElementById('fullAddress').value = parts.join(', ');
+        }
+    }
+    
+    // Function to reverse geocode from coordinates
+    function reverseGeocode(lat, lng) {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.address) {
+                    updateFormFields(lat, lng, data.address);
+                }
+            })
+            .catch(error => console.error('Error in reverse geocoding:', error));
+    }
+    
+    // Handle map click
+    map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        marker.setLatLng([lat, lng]);
+        reverseGeocode(lat, lng);
+    });
+    
+    // Handle marker drag
+    marker.on('dragend', function(e) {
+        const position = marker.getLatLng();
+        reverseGeocode(position.lat, position.lng);
+    });
+    
+    // Handle search input
+    document.getElementById('mapSearchBtn').addEventListener('click', performSearch);
+    document.getElementById('mapSearchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+    
+    function performSearch() {
+        const query = document.getElementById('mapSearchInput').value;
+        if (!query) return;
+        
+        // Append Philippines to improve local results if not specified
+        const searchQuery = query.toLowerCase().includes('philippines') ? query : query + ', Philippines';
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&addressdetails=1&limit=1`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const result = data[0];
+                    const lat = parseFloat(result.lat);
+                    const lng = parseFloat(result.lon);
+                    
+                    // Move map and marker
+                    map.setView([lat, lng], 15);
+                    marker.setLatLng([lat, lng]);
+                    
+                    // Update form
+                    updateFormFields(lat, lng, result.address);
+                } else {
+                    alert('Location not found. Please try a different search term or click on the map.');
+                }
+            })
+            .catch(error => console.error('Error in geocoding search:', error));
+    }
+    // Handle get location button
+    const getLocBtn = document.getElementById('getLocationBtn');
+    if (getLocBtn) {
+        getLocBtn.addEventListener('click', function() {
+            if (navigator.geolocation) {
+                // Visual feedback
+                const originalHtml = getLocBtn.innerHTML;
+                getLocBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                getLocBtn.disabled = true;
+                
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Move map and marker
+                    map.setView([lat, lng], 16);
+                    marker.setLatLng([lat, lng]);
+                    
+                    // Geocode the location
+                    reverseGeocode(lat, lng);
+                    
+                    // Restore button
+                    getLocBtn.innerHTML = originalHtml;
+                    getLocBtn.disabled = false;
+                }, function(error) {
+                    alert('Error getting location: ' + error.message);
+                    getLocBtn.innerHTML = originalHtml;
+                    getLocBtn.disabled = false;
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

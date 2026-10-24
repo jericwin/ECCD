@@ -1,0 +1,360 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}System Management - Super Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-0 text-dark">System Management</h2>
+    <p class="text-muted">View all schools, municipalities, provinces, and enrollment statistics system-wide.</p>
+</div>
+
+<!-- Enrollment Stats Banner -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center h-100" style="border-radius:14px;background:linear-gradient(135deg,#e3f2fd,#bbdefb);">
+            <div class="card-body p-3">
+                <h3 class="fw-bold text-primary mb-0">{{ enroll_stats.total }}</h3>
+                <small class="text-muted fw-semibold">Total Enrollments</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center h-100" style="border-radius:14px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+            <div class="card-body p-3">
+                <h3 class="fw-bold text-success mb-0">{{ enroll_stats.approved }}</h3>
+                <small class="text-muted fw-semibold">Approved</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center h-100" style="border-radius:14px;background:linear-gradient(135deg,#fff8e1,#ffecb3);">
+            <div class="card-body p-3">
+                <h3 class="fw-bold text-warning mb-0">{{ enroll_stats.pending }}</h3>
+                <small class="text-muted fw-semibold">Pending</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center h-100" style="border-radius:14px;background:linear-gradient(135deg,#ffebee,#ffcdd2);">
+            <div class="card-body p-3">
+                <h3 class="fw-bold text-danger mb-0">{{ enroll_stats.rejected }}</h3>
+                <small class="text-muted fw-semibold">Rejected</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-pills mb-4 gap-2" id="systemTabs">
+    <li class="nav-item">
+        <a class="nav-link active rounded-pill px-4" data-bs-toggle="pill" href="#schoolsTab">
+            <i class="bi bi-building me-1"></i> All Schools ({{ all_schools|length }})
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link rounded-pill px-4" data-bs-toggle="pill" href="#munisTab">
+            <i class="bi bi-geo-alt me-1"></i> Municipalities ({{ all_munis|length }})
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link rounded-pill px-4" data-bs-toggle="pill" href="#provincesTab">
+            <i class="bi bi-map me-1"></i> Provinces ({{ all_provinces|length }})
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+    <!-- Schools Tab -->
+    <div class="tab-pane fade show active" id="schoolsTab">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-body p-0">
+                {% if all_schools %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-secondary small">
+                            <tr>
+                                <th class="ps-4">School Name</th>
+                                <th>Municipality</th>
+                                <th>Province</th>
+                                <th>Status</th>
+                                <th class="text-center">Capacity</th>
+                                <th class="text-center">Enrolled</th>
+                                <th class="text-center">Pending</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for s in all_schools %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-dark small">{{ s.name }}</td>
+                            <td class="small"><span class="badge bg-info bg-opacity-10 text-info rounded-pill px-2">{{ s.municipality_name }}</span></td>
+                            <td class="text-muted small">{{ s.province_name }}</td>
+                            <td>
+                                {% if s.status == 'approved' %}<span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 small">Approved</span>
+                                {% elif s.status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 small">Pending</span>
+                                {% else %}<span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 small">Rejected</span>{% endif %}
+                            </td>
+                            <td class="text-center small">{{ s.capacity or '—' }}</td>
+                            <td class="text-center"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 small">{{ s.enrolled }}</span></td>
+                            <td class="text-center"><span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 small">{{ s.pending_enroll }}</span></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted"><h6>No schools in the system yet.</h6></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Municipalities Tab -->
+    <div class="tab-pane fade" id="munisTab">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center rounded-top-4">
+                <h6 class="mb-0 fw-bold">All Municipalities</h6>
+                <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addMunicipalityModal">
+                    <i class="bi bi-plus-lg me-1"></i> Add Municipality
+                </button>
+            </div>
+            <div class="card-body p-0">
+                {% if all_munis %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-secondary small">
+                            <tr>
+                                <th class="ps-4">Municipality / City</th>
+                                <th>Province</th>
+                                <th class="text-center">Schools</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for m in all_munis %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-dark">{{ m.name }}</td>
+                            <td class="text-muted">{{ m.province_name }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2">{{ m.schools_count }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted"><h6>No municipalities yet.</h6></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Provinces Tab -->
+    <div class="tab-pane fade" id="provincesTab">
+        <div class="card border-0 shadow-sm" style="border-radius:16px;">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center rounded-top-4">
+                <h6 class="mb-0 fw-bold">All Provinces</h6>
+                <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addProvinceModal">
+                    <i class="bi bi-plus-lg me-1"></i> Add Province
+                </button>
+            </div>
+            <div class="card-body p-0">
+                {% if all_provinces %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-secondary small">
+                            <tr>
+                                <th class="ps-4">Province Name</th>
+                                <th class="text-center">Municipalities</th>
+                                <th class="text-center">Schools</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for p in all_provinces %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-dark">{{ p.name }}</td>
+                            <td class="text-center"><span class="badge bg-info bg-opacity-10 text-info rounded-pill px-2">{{ p.muni_count }}</span></td>
+                            <td class="text-center"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">{{ p.school_count }}</span></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted"><h6>No provinces yet.</h6></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Add Province Modal -->
+<div class="modal fade" id="addProvinceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content border-0 shadow" style="border-radius:14px;">
+        <div class="modal-header border-0 bg-light rounded-top-4">
+            <h6 class="modal-title fw-bold"><i class="bi bi-map me-2"></i>Add Province</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form action="{{ url_for('superadmin.create_province') }}" method="POST">
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Region <span class="text-danger">*</span></label>
+                    <select id="prov_region" class="form-select bg-light border-0" required>
+                        <option value="">Loading regions...</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label fw-semibold">Province <span class="text-danger">*</span></label>
+                    <select id="prov_province" name="name" class="form-select bg-light border-0" disabled required>
+                        <option value="">Select region first...</option>
+                    </select>
+                </div>
+                <small class="text-muted">The selected province name will be saved to the system.</small>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Add Province</button>
+            </div>
+        </form>
+    </div></div>
+</div>
+
+<!-- Add Municipality Modal -->
+<div class="modal fade" id="addMunicipalityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content border-0 shadow" style="border-radius:14px;">
+        <div class="modal-header border-0 bg-light rounded-top-4">
+            <h6 class="modal-title fw-bold"><i class="bi bi-geo-alt me-2"></i>Add Municipality</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form action="{{ url_for('superadmin.create_municipality') }}" method="POST">
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Province (from system) <span class="text-danger">*</span></label>
+                    <select id="muni_province_db" name="province_id" class="form-select bg-light border-0" required>
+                        <option value="">Select province...</option>
+                        {% for p in all_provinces %}
+                        <option value="{{ p.id }}" data-name="{{ p.name }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label fw-semibold">Municipality / City <span class="text-danger">*</span></label>
+                    <select id="muni_city" name="name" class="form-select bg-light border-0" disabled required>
+                        <option value="">Select province first...</option>
+                    </select>
+                    <div id="muni_loading" class="text-muted small mt-1" style="display:none;">
+                        <span class="spinner-border spinner-border-sm me-1"></span> Loading municipalities...
+                    </div>
+                </div>
+                <small class="text-muted">Municipality list is fetched from the Philippine Standard Geographic Code (PSGC).</small>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Add Municipality</button>
+            </div>
+        </form>
+    </div></div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Add Province Modal: Region → Province via PSGC ─────────────────────────
+(function() {
+    const provRegionSel  = document.getElementById('prov_region');
+    const provProvinceSel = document.getElementById('prov_province');
+    if (!provRegionSel) return;
+
+    fetch('https://psgc.gitlab.io/api/regions/')
+        .then(r => r.json())
+        .then(data => {
+            data.sort((a,b) => a.name.localeCompare(b.name));
+            provRegionSel.innerHTML = '<option value="">Select region...</option>';
+            data.forEach(reg => {
+                const opt = document.createElement('option');
+                opt.value = reg.code;
+                opt.textContent = reg.name;
+                provRegionSel.appendChild(opt);
+            });
+        })
+        .catch(() => { provRegionSel.innerHTML = '<option value="">Failed to load regions</option>'; });
+
+    provRegionSel.addEventListener('change', function() {
+        provProvinceSel.innerHTML = '<option value="">Loading...</option>';
+        provProvinceSel.disabled = true;
+        fetch(`https://psgc.gitlab.io/api/regions/${this.value}/provinces/`)
+            .then(r => r.json())
+            .then(data => {
+                data.sort((a,b) => a.name.localeCompare(b.name));
+                provProvinceSel.innerHTML = '<option value="">Select province...</option>';
+                data.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name;
+                    opt.textContent = p.name;
+                    provProvinceSel.appendChild(opt);
+                });
+                provProvinceSel.disabled = false;
+            })
+            .catch(() => {
+                provProvinceSel.innerHTML = '<option value="">Failed to load provinces</option>';
+            });
+    });
+})();
+
+// ── Add Municipality Modal: DB Province → PSGC Cities/Municipalities ───────
+(function() {
+    const muniProvDbSel = document.getElementById('muni_province_db');
+    const muniCitySel   = document.getElementById('muni_city');
+    const muniLoading   = document.getElementById('muni_loading');
+    if (!muniProvDbSel) return;
+
+    // Map province name to PSGC province code
+    muniProvDbSel.addEventListener('change', function() {
+        const provinceName = this.options[this.selectedIndex].dataset.name || this.options[this.selectedIndex].text;
+        muniCitySel.innerHTML = '<option value="">Loading municipalities...</option>';
+        muniCitySel.disabled = true;
+        muniLoading.style.display = '';
+
+        // First, search all provinces from PSGC to find the matching code
+        fetch('https://psgc.gitlab.io/api/provinces/')
+            .then(r => r.json())
+            .then(provinces => {
+                const match = provinces.find(p =>
+                    p.name.toLowerCase() === provinceName.toLowerCase()
+                );
+                if (!match) {
+                    // Try fetching as a district (e.g. NCR)
+                    muniCitySel.innerHTML = '<option value="">Province not found in PSGC. Enter manually.</option>';
+                    muniCitySel.disabled = false;
+                    muniLoading.style.display = 'none';
+                    // Fallback: allow manual text input
+                    const manualOpt = document.createElement('option');
+                    manualOpt.value = provinceName + ' Municipality';
+                    manualOpt.textContent = '(Type municipality name below)';
+                    muniCitySel.appendChild(manualOpt);
+                    return;
+                }
+                return fetch(`https://psgc.gitlab.io/api/provinces/${match.code}/cities-municipalities/`)
+                    .then(r => r.json());
+            })
+            .then(cities => {
+                if (!cities) return;
+                cities.sort((a,b) => a.name.localeCompare(b.name));
+                muniCitySel.innerHTML = '<option value="">Select municipality/city...</option>';
+                cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.name;
+                    opt.textContent = c.name;
+                    muniCitySel.appendChild(opt);
+                });
+                muniCitySel.disabled = false;
+                muniLoading.style.display = 'none';
+            })
+            .catch(() => {
+                muniCitySel.innerHTML = '<option value="">Failed to load. Try again.</option>';
+                muniCitySel.disabled = false;
+                muniLoading.style.display = 'none';
+            });
+    });
+})();
+</script>
+{% endblock %}

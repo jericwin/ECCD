@@ -227,9 +227,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if session.get('user_id') %}
-                        {% if session.get('role') == 'parent' %}
                         <li class="nav-item me-3">
-                            <a class="nav-link position-relative" href="{{ url_for('parent.notifications') }}">
+                            <a class="nav-link position-relative" href="#" onclick="alert('Notification Center coming soon!')">
                                 <i class="bi bi-bell-fill fs-5 text-secondary"></i>
                                 {% if unread_notifications %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
@@ -239,7 +238,6 @@
                                 {% endif %}
                             </a>
                         </li>
-                        {% endif %}
                         <li class="nav-item me-3">
                             <span class="navbar-text">
                                 <i class="bi bi-person-circle me-1"></i> Hello, <strong>{{ session.get('username') }}</strong> 

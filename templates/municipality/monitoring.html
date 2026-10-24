@@ -1,0 +1,129 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Monitoring - Municipality Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-0 text-dark">Monitoring</h2>
+    <p class="text-muted">View enrollment statistics across all schools in your municipality.</p>
+</div>
+
+<!-- Summary Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-white" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-people-fill fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase" style="font-size:.75rem;">Total Enrolled</h6>
+                    <h2 class="mb-0 fw-bold">{{ total_enrolled }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-dark" style="background:linear-gradient(135deg,#f9a825,#f57f17);border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-50 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-hourglass-split fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold text-uppercase" style="font-size:.75rem;color:rgba(0,0,0,.55);">Pending Enrollments</h6>
+                    <h2 class="mb-0 fw-bold">{{ total_pending }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-white" style="background:linear-gradient(135deg,#2e7d32,#1b5e20);border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-person-check fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase" style="font-size:.75rem;">Total Capacity</h6>
+                    <h2 class="mb-0 fw-bold">{{ total_capacity }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-white" style="background:linear-gradient(135deg,#00838f,#006064);border-radius:16px;">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width:60px;height:60px;flex-shrink:0;">
+                    <i class="bi bi-person-plus fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase" style="font-size:.75rem;">Available Slots</h6>
+                    <h2 class="mb-0 fw-bold">{{ total_slots }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schools Enrollment Table -->
+<div class="card border-0 shadow-sm" style="border-radius:16px;">
+    <div class="card-header bg-white border-bottom py-3 rounded-top-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-bar-chart-line text-primary me-2"></i>School Enrollment Statistics</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if schools_stats %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary small">
+                    <tr>
+                        <th class="ps-4">School Name</th>
+                        <th>Status</th>
+                        <th class="text-center">Capacity</th>
+                        <th class="text-center">Enrolled</th>
+                        <th class="text-center">Pending</th>
+                        <th class="text-center">Rejected</th>
+                        <th class="text-center">Available</th>
+                        <th class="pe-4">Occupancy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in schools_stats %}
+                    {% set capacity = s.capacity or 0 %}
+                    {% set occupied = s.enrolled_count %}
+                    {% set available = [capacity - occupied, 0] | max %}
+                    {% set pct = ((occupied / capacity * 100) | int) if capacity > 0 else 0 %}
+                    <tr>
+                        <td class="ps-4 fw-semibold text-dark">{{ s.name }}</td>
+                        <td>
+                            {% if s.status == 'approved' %}<span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1">Approved</span>
+                            {% elif s.status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 py-1">Pending</span>
+                            {% else %}<span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 py-1">Rejected</span>{% endif %}
+                        </td>
+                        <td class="text-center">{{ capacity or '—' }}</td>
+                        <td class="text-center"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">{{ occupied }}</span></td>
+                        <td class="text-center"><span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2">{{ s.pending_enrollments }}</span></td>
+                        <td class="text-center"><span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2">{{ s.rejected_enrollments }}</span></td>
+                        <td class="text-center"><span class="badge bg-info bg-opacity-10 text-info rounded-pill px-2">{{ available }}</span></td>
+                        <td class="pe-4" style="min-width:130px;">
+                            {% if capacity > 0 %}
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height:8px;border-radius:4px;">
+                                    <div class="progress-bar {% if pct >= 90 %}bg-danger{% elif pct >= 70 %}bg-warning{% else %}bg-success{% endif %}"
+                                         role="progressbar" style="width:{{ pct }}%"></div>
+                                </div>
+                                <small class="text-muted fw-bold" style="width:35px;font-size:.75rem;">{{ pct }}%</small>
+                            </div>
+                            {% else %}<span class="text-muted small">—</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-bar-chart fs-1 text-primary opacity-50 d-block mb-3"></i>
+            <h5>No school data available yet.</h5>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -2,9 +2,48 @@
 
 {% block title %}Educator Registration - ECCD System{% endblock %}
 
+{% block extra_css %}
+<style>
+    main.container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .auth-wrapper {
+        min-height: calc(100vh - 76px);
+        background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        padding: 4rem 0;
+    }
+    .blob {
+        position: absolute;
+        filter: blur(80px);
+        z-index: 0;
+        border-radius: 50%;
+        animation: pulse-soft 8s infinite alternate;
+    }
+    .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: rgba(134, 239, 172, 0.4); }
+    .blob-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: rgba(147, 197, 253, 0.4); }
+    
+    @keyframes pulse-soft {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.8; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center py-5">
-    <div class="col-lg-8 col-xl-7">
+<div class="auth-wrapper w-100">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="container position-relative z-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="bg-primary bg-gradient p-4 p-md-5 text-center text-white">
                 <div class="mb-3">
@@ -184,6 +223,7 @@
                         <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">Create Account</button>
                     </div>
                 </form>
+            </div>
             </div>
         </div>
     </div>

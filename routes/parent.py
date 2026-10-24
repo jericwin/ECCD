@@ -43,15 +43,8 @@ def inject_notifications():
                             (user_id, 'Upcoming Deadline', msg, link),
                             commit=True
                         )
-        
-        # Fetch all unread notifications
-        notifications = execute_query(
-            "SELECT * FROM notifications WHERE user_id = %s AND is_read = FALSE ORDER BY created_at DESC",
-            (user_id,),
-            fetch_all=True
-        ) or []
-        return dict(unread_notifications=notifications)
-    return dict(unread_notifications=[])
+        return dict()
+    return dict()
 
 @parent_bp.route('/notifications')
 def notifications():
@@ -107,23 +100,27 @@ def dashboard():
         flash('Child profile not found. Please contact administration.', 'error')
         return redirect(url_for('main.landing'))
         
-    # Get classroom details if enrolled
-    classroom = execute_query(
-        """SELECT c.*, t.full_name as teacher_name FROM classrooms c
-           JOIN classroom_learners cl ON cl.classroom_id = c.id
-           JOIN teachers t ON c.teacher_id = t.id
-           WHERE cl.learner_id = %s""",
-        (learner['id'],),
-        fetch_one=True
+    # Check enrollment status
+    enrollment_request = execute_query(
+        "SELECT * FROM enrollment_requests WHERE learner_id = %s ORDER BY created_at DESC LIMIT 1",
+        (learner['id'],), fetch_one=True
     )
     
-    # Get stats
-    res = execute_query(
-        "SELECT COUNT(*) as count FROM classroom_learners WHERE learner_id = %s",
-        (learner['id'],),
-        fetch_one=True
-    )
-    enrolled_classes_count = res['count'] if res else 0
+    # Get classroom details if enrolled
+    classroom = None
+    if enrollment_request and enrollment_request['status'] == 'accepted' and enrollment_request['classroom_id']:
+        classroom = execute_query(
+            """SELECT c.*, t.full_name as teacher_name, s.name as school_name 
+               FROM classrooms c
+               JOIN teachers t ON c.teacher_id = t.id
+               JOIN schools s ON t.school_id = s.id
+               WHERE c.id = %s""",
+            (enrollment_request['classroom_id'],),
+            fetch_one=True
+        )
+    
+    # Get stats if they are in a classroom
+    enrolled_classes_count = 1 if classroom else 0
     
     bmi_record = execute_query(
         "SELECT * FROM bmi_records WHERE learner_id = %s ORDER BY recorded_date DESC LIMIT 1",
@@ -137,6 +134,7 @@ def dashboard():
         parent=parent,
         learner=learner,
         classroom=classroom,
+        enrollment_request=enrollment_request,
         enrolled_classes_count=enrolled_classes_count,
         bmi_record=bmi_record
     )
@@ -662,3 +660,102 @@ def classwork_submission(classwork_id):
         assessment=assessment
     )
 
+
+# ─── Group Chat ────────────────────────────────────────────────────────────────
+
+def _get_chat_classroom_and_members(learner_id):
+    """Return (classroom, members_list) for the group chat, or (None, [])."""
+    classroom = execute_query(
+        """SELECT c.*, t.full_name as teacher_name, t.user_id as teacher_user_id
+           FROM classrooms c
+           JOIN classroom_learners cl ON cl.classroom_id = c.id
+           JOIN teachers t ON c.teacher_id = t.id
+           WHERE cl.learner_id = %s LIMIT 1""",
+        (learner_id,),
+        fetch_one=True
+    )
+    if not classroom:
+        return None, []
+
+    # Teacher first
+    members = [{'name': classroom['teacher_name'], 'role': 'teacher',
+                 'user_id': classroom['teacher_user_id']}]
+    # All parents enrolled in this classroom
+    parents = execute_query(
+        """SELECT p.parent_name as name, u.id as user_id
+           FROM parents p
+           JOIN users u ON p.user_id = u.id
+           JOIN learners l ON l.parent_id = p.id
+           JOIN classroom_learners cl ON cl.learner_id = l.id
+           WHERE cl.classroom_id = %s""",
+        (classroom['id'],),
+        fetch_all=True
+    ) or []
+    for pa in parents:
+        members.append({'name': pa['name'], 'role': 'parent', 'user_id': pa['user_id']})
+
+    return classroom, members
+
+
+@parent_bp.route('/parent/group-chat')
+def group_chat():
+    if 'user_id' not in session or session.get('role') != 'parent':
+        return redirect(url_for('auth.login'))
+
+    parent, learner = get_parent_and_child(session['user_id'])
+    if not parent or not learner:
+        flash('Child profile not found.', 'error')
+        return redirect(url_for('parent.dashboard'))
+
+    classroom, members = _get_chat_classroom_and_members(learner['id'])
+    if not classroom:
+        flash('You are not enrolled in any classroom yet.', 'info')
+        return redirect(url_for('parent.enroll'))
+
+    messages = execute_query(
+        """SELECT * FROM group_chat_messages
+           WHERE classroom_id = %s ORDER BY sent_at ASC""",
+        (classroom['id'],),
+        fetch_all=True
+    ) or []
+
+    return render_template(
+        'parent/group_chat.html',
+        active_page='group_chat',
+        classroom=classroom,
+        members=members,
+        messages=messages,
+        current_user_id=session['user_id']
+    )
+
+
+@parent_bp.route('/parent/group-chat/<int:classroom_id>/send', methods=['POST'])
+def group_chat_send(classroom_id):
+    if 'user_id' not in session or session.get('role') != 'parent':
+        return redirect(url_for('auth.login'))
+
+    parent, learner = get_parent_and_child(session['user_id'])
+    if not parent or not learner:
+        return redirect(url_for('parent.dashboard'))
+
+    # Verify the parent is in this classroom
+    is_member = execute_query(
+        "SELECT id FROM classroom_learners WHERE classroom_id = %s AND learner_id = %s",
+        (classroom_id, learner['id']),
+        fetch_one=True
+    )
+    if not is_member:
+        flash('Access denied.', 'error')
+        return redirect(url_for('parent.dashboard'))
+
+    message = request.form.get('message', '').strip()
+    if message:
+        execute_query(
+            """INSERT INTO group_chat_messages
+               (classroom_id, sender_user_id, sender_name, sender_role, message)
+               VALUES (%s, %s, %s, 'parent', %s)""",
+            (classroom_id, session['user_id'], parent['parent_name'], message),
+            commit=True
+        )
+
+    return redirect(url_for('parent.group_chat'))

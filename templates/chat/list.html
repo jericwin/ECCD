@@ -1,0 +1,85 @@
+{% extends 'dashboard_base.html' %}
+
+{% block dashboard_content %}
+<style>
+  .gc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; }
+  .gc-card {
+    display:flex; align-items:center; gap:0.9rem;
+    padding:0.9rem 1rem; border-radius:14px;
+    background:#fff; border:1px solid #e8f5ee;
+    cursor:pointer; transition:box-shadow 0.2s, transform 0.15s;
+    text-decoration:none; color:inherit;
+    margin-bottom:0.6rem;
+  }
+  .gc-card:hover { box-shadow:0 4px 16px rgba(26,122,74,0.12); transform:translateY(-1px); border-color:#b2dfdb; }
+  .gc-avatar {
+    width:50px; height:50px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#22a86a,#1a7a4a);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:1.3rem; font-weight:700;
+  }
+  .gc-info { flex:1; min-width:0; }
+  .gc-name { font-weight:700; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gc-preview { font-size:0.78rem; color:#78909c; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+  .gc-meta { text-align:right; flex-shrink:0; }
+  .gc-time { font-size:0.7rem; color:#bbb; }
+  .gc-badge { font-size:0.7rem; background:#e8f5ee; color:#1a7a4a; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+  .empty-state { text-align:center; padding:4rem 1rem; color:#b0bec5; }
+  .btn-new-gc {
+    background:linear-gradient(135deg,#22a86a,#1a7a4a);
+    color:#fff; border:none; border-radius:22px;
+    padding:0.5rem 1.3rem; font-weight:600; font-size:0.9rem;
+    display:inline-flex; align-items:center; gap:0.4rem;
+    cursor:pointer; transition:opacity 0.2s, transform 0.15s;
+    text-decoration:none;
+  }
+  .btn-new-gc:hover { opacity:0.9; transform:scale(1.02); color:#fff; }
+</style>
+
+<div class="gc-header">
+  <h5 class="fw-bold mb-0 text-success"><i class="bi bi-chat-dots-fill me-2"></i>Group Chats</h5>
+  <a href="{{ url_for('chat.create_chat') }}" class="btn-new-gc">
+    <i class="bi bi-plus-lg"></i> New Group
+  </a>
+</div>
+
+{% if groups %}
+  {% for g in groups %}
+  <a href="{{ url_for('chat.view_chat', group_id=g.id) }}" class="gc-card">
+    <div class="gc-avatar">{{ g.name[0].upper() }}</div>
+    <div class="gc-info">
+      <div class="gc-name">{{ g.name }}</div>
+      <div class="gc-preview">
+        {% if g.last_message %}
+          <strong>{{ g.last_sender }}:</strong> {{ g.last_message[:60] }}{% if g.last_message|length > 60 %}…{% endif %}
+        {% else %}
+          <em>No messages yet</em>
+        {% endif %}
+      </div>
+    </div>
+    <div class="gc-meta">
+      <div class="gc-time">
+        {% if g.last_sent_at %}
+          {{ g.last_sent_at.strftime('%I:%M %p') if g.last_sent_at.date() == now.date() else g.last_sent_at.strftime('%b %d') }}
+        {% endif %}
+      </div>
+      <div class="gc-badge mt-1">{{ g.member_count }} member{{ 's' if g.member_count != 1 else '' }}</div>
+    </div>
+  </a>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <i class="bi bi-chat-square-dots" style="font-size:3.5rem;"></i>
+    <h5 class="fw-bold mt-3 text-dark">No group chats yet</h5>
+    <p class="mb-4">Create a group to start collaborating with parents and teachers.</p>
+    <a href="{{ url_for('chat.create_chat') }}" class="btn-new-gc">
+      <i class="bi bi-plus-lg"></i> Create First Group
+    </a>
+  </div>
+{% endif %}
+
+<script>
+  // Pass now for date comparison
+  const now = new Date();
+</script>
+{% endblock %}
